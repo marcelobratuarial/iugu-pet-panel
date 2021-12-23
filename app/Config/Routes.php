@@ -40,6 +40,7 @@ $routes->get('/', function () {
 }); //,['filter' => 'authFilter']);
 $routes->get('/dashboard', 'Home::index', ['filter' => 'authFilter']);
 $routes->get('/planos/edit/(:any)', 'Home::planoEdit/$1', ['filter' => 'authFilter']);
+$routes->get('/planos/add', 'Home::planoCreate/$1', ['filter' => 'authFilter']);
 $routes->get('/planos', 'Home::planos', ['filter' => 'authFilter']);
 $routes->get('/services', 'Home::services');
 $routes->get('/assinar/(:any)', 'Home::assinar/$1');

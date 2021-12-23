@@ -12,8 +12,8 @@
                     <li class="breadcrumb-item"><a href="<?= base_url("/") ?>"><i class="bx bx-home-alt"></i></a>
                     </li>
                     <li class="breadcrumb-item" aria-current="page"><a href="<?= base_url("planos") ?>">Planos</a></li>
-                    <li class="breadcrumb-item" aria-current="page">Editar</li>
-                    <li class="breadcrumb-item  breadcrumb-plan-name" aria-current="page"><?= $plan["name"] ?></li>
+                    <li class="breadcrumb-item" aria-current="page">Adicionar</li>
+                    <li class="breadcrumb-item active breadcrumb-plan-name" aria-current="page" >Novo plano</li>
                 </ol>
             </nav>
         </div>
@@ -34,7 +34,7 @@
 
     <div class="card">
         <div class="card-body p-4">
-            <h5 class="card-title">EDITAR PLANO</h5>
+            <h5 class="card-title">CRIAR NOVO PLANO</h5>
             <hr />
             <?php //print_r($plan); 
             ?>
@@ -47,7 +47,7 @@
                                 <div class="genericOverlay"></div>
                                 <div class="mb-3">
                                     <label for="inputPlanName" class="form-label">Nome do plano</label>
-                                    <input type="text" name="name" class="form-control" id="inputPlanName" value="<?= $plan["name"] ?>" placeholder="Nome do plano">
+                                    <input type="text" name="name" class="form-control" id="inputPlanName" value="" placeholder="Nome do plano">
                                 </div>
                                 <!-- <div class="mb-3">
                                     <label for="inputPlanDescription" class="form-label">Description</label>
@@ -69,23 +69,6 @@
                                         </h5>
                                         <div class="card-body features-box">
                                             <ul class="list-group list-group-flush">
-
-                                                <?php foreach ($plan['features'] as $feat) : ?>
-                                                    <li data-fid="<?= $feat["id"] ?>" class="feat-item list-group-item d-flex justify-content-between align-items-center">
-                                                        <span><?= $feat["name"] ?></span>
-                                                        <div class="d-flex justify-content-center align-items-center">
-                                                            <div class="confirm-box" style="display: none;">
-                                                                <div class="d-flex justify-content-center align-items-center">
-                                                                    Confirmar?
-                                                                    <a class="remove-confirm" href="" data-bs-toggle="tooltip" data-bs-placement="top" title="Remover recurso"><i class="bx bx-check font-20 text-danger"></i></a>
-                                                                    <a class="remove-cancel" href="" data-bs-toggle="tooltip" data-bs-placement="top" title="Cancelar"><i class="bx bx-x-circle font-18 text-success"></i></a>
-                                                                </div>
-                                                            </div>
-                                                            <a class="remove-feature" href="javascript:;"><i class="bx bx-trash-alt font-14 text-danger"></i></a>
-                                                        </div>
-                                                    </li>
-                                                <?php endforeach; ?>
-
                                             </ul>
                                             <?php
                                             if (isset($plan["features"]) && count($plan["features"]) == 0) :
@@ -111,7 +94,7 @@
                                 <div class="row g-3">
                                     <div class="col-md-12">
                                         <label for="inputPrice" class="form-label">Valor do Plano</label>
-                                        <input name="value_cents" type="text" class="form-control" id="inputPrice" value="<?= $plan['real'] ?>" placeholder="00,00">
+                                        <input name="value_cents" type="text" class="form-control" id="inputPrice" value="" placeholder="00,00">
                                     </div>
 
                                 </div>
@@ -119,14 +102,14 @@
                                 <div class="row">
                                     <div class="col-5">
                                         <label for="inputInterval" class="form-label">Intervalo <i class="bx bx-info-circle font-12" data-bs-toggle="tooltip" data-bs-placement="top" title="Ciclo do plano (Número inteiro maior que 0). Intervalo até a próxima cobrança."></i></label>
-                                        <input name="interval" type="number" class="form-control" id="inputInterval" value="<?= $plan['interval'] ?>" placeholder="1">
+                                        <input name="interval" type="number" class="form-control" id="inputInterval" value="" placeholder="1">
                                     </div>
                                     <div class="col-7">
                                         <label for="inputProductType" class="form-label">Tipo de intervalo</label>
                                         <select name="interval_type" class="form-select" id="inputProductType">
                                             <option>--</option>
-                                            <option <?= $plan['interval_type'] == 'weeks' ? 'selected' : '' ?> value="weeks">Semana</option>
-                                            <option <?= $plan['interval_type'] == 'months' ? 'selected' : '' ?> value="months">Mês</option>
+                                            <option value="weeks">Semana</option>
+                                            <option value="months">Mês</option>
                                         </select>
                                     </div>
 
@@ -135,19 +118,19 @@
                                 <div class="row">
                                     <div class="col-6">
                                         <label for="inputMaxCycles" class="form-label">Limite do ciclo <i class="bx bx-info-circle font-12" data-bs-toggle="tooltip" data-bs-placement="top" title="Limite de ciclos da assinatura - 0 para indeterminado"></i></label>
-                                        <input name="max_cycles" type="number" class="form-control" id="inputMaxCycles" value="<?= $plan['max_cycles'] ?>" placeholder="1">
+                                        <input name="max_cycles" type="number" class="form-control" id="inputMaxCycles" value="" placeholder="1">
                                     </div>
                                 </div>
                                 <hr>
                                 <div class="row">
                                     <div class="col-8">
                                         <label for="inputBillingDays" class="form-label">Dias para faturamento <i class="bx bx-info-circle font-12" data-bs-toggle="tooltip" data-bs-placement="top" title="Dias de faturamento (Quantos dias antes de vencer a assinatura será gerada uma nova fatura)"></i></label>
-                                        <input name="billing_days" type="number" class="form-control" id="inputBillingDays" value="<?= $plan['billing_days'] ?>" placeholder="1">
+                                        <input name="billing_days" type="number" class="form-control" id="inputBillingDays" value="" placeholder="1">
                                     </div>
                                 </div>
                                 <hr>
                                 <div class="row g-3">
-                                    <input type="hidden" id="h-plan-id" name="h_plan_id" value="<?= $plan['id'] ?>">
+                                    <input type="hidden" id="h-plan-id" name="h_plan_id" value="">
                                     <div class="col-12">
                                         <div class="d-grid">
                                             <button type="submit" class="btn save-plan-btn btn-primary">Salvar plano</button>
@@ -321,8 +304,9 @@
             // console.log(s)
             var p = {}
             $.each(s, function(i, v) {
-                if (v.name == 'h_plan_id') {
-                    p['id'] = v.value
+                if (v.name == 'name') {
+                    p['name'] = v.value
+                    p['identifier'] = sl(v.value)
                 } else if (v.name == 'value_cents') {
                     console.warn(v.value)
                     console.log($("#inputPrice").maskMoney('unmasked'))
@@ -365,8 +349,8 @@
 
             var url = '<?= base_url('/api') ?>';
             var payload = {
-                'call': 'plans/' + $("#h-plan-id").val(),
-                'method': 'PUT',
+                'call': 'plans',
+                'method': 'POST',
                 'payload': p
             }
             console.log(payload);
@@ -409,7 +393,6 @@
                             $(nf).appendTo(".features-box > ul")
                             // console.log(f)
                         })
-                        $(".breadcrumb-plan-name").html(response.name)
                         if ($(".features-box > ul li").length > 0) {
                             $(".no-features").slideUp(50)
                         } else {
@@ -420,7 +403,6 @@
                             $("#SuccessModal").modal("hide")
 
                         }, 2500);
-                        
                     }
                     $('.save-plan-btn').removeClass('disabled')
                     $('.save-plan-btn').removeAttr('disabled')

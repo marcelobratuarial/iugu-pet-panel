@@ -71,9 +71,47 @@ class Home extends BaseController
         } else {
             $user = [];
         }
-        // print_r($user);exit;
+        print_r($user);exit;
         // print_r(json_decode($r, true));exit;
         return view('dashboard', ["plans" => $planos, "user" => $user, "pd" => $this->pageData]);
+    }
+
+    public function planoCreate()
+    {
+        helper("text");
+        session();
+        $this->pageData["title"] = "Criar plano";
+        if(isset($_SESSION['email'])) {
+            // echo "<pre>";
+            // print_r($_SESSION);
+            // echo "</pre>";
+            $args = [];
+            $args["m"] = "GET";
+            $this->requestURL = $this->baseApi . "customers";
+            $args["pl"] = json_encode([
+                "query" => $_SESSION['email']
+            ]);
+            $result = $this->doRequest($this->requestURL, $args);
+            
+            $result = json_decode($result, true);
+            
+            $user = [];
+            if($result["totalItems"] > 0) {
+                $users = $result['items'];
+                foreach($users as $u) {
+                    if($u["email"] == $_SESSION['email']) {
+                        $user = $u;
+                        $user["m"] = ellipsize($user["email"], 18);
+                        break;
+                    }
+                }
+            }
+        } else {
+            $user = [];
+        }
+        // print_r($user);exit;
+        // print_r(json_decode($r, true));exit;
+        return view('plan-add', ["pd" => $this->pageData, "user" => $user]);
     }
 
     public function planoEdit($id)
@@ -172,11 +210,12 @@ class Home extends BaseController
             }
         }
         session();
-        // echo "<pre>";print_r($a->get("name"));exit;
+        echo "<pre>";
+        print_r($_SESSION['email']);exit;
         if(isset($_SESSION['email'])) {
-            // echo "<pre>";
-            // print_r($_SESSION);
-            // echo "</pre>";
+            echo "<pre>";
+            print_r($_SESSION);
+            echo "</pre>";
             $args = [];
             $args["m"] = "GET";
             $this->requestURL = $this->baseApi . "customers";
