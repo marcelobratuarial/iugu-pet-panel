@@ -3,7 +3,7 @@
 namespace App\Controllers;
 use CodeIgniter\API\ResponseTrait;
 use App\Models\PetModel;
-
+use App\Models\UserModel;
 class Home extends BaseController
 {
     use ResponseTrait;
@@ -52,7 +52,7 @@ class Home extends BaseController
             // echo "<pre>";
             // print_r($_SESSION);
             // echo "</pre>";
-            $args = [];
+            /* $args = [];
             $args["m"] = "GET";
             $this->requestURL = $this->baseApi . "customers";
             $args["pl"] = json_encode([
@@ -67,11 +67,18 @@ class Home extends BaseController
             if($u["totalItems"] > 0) {
                 $user = $u['items'][0];
                 $user["m"] = ellipsize($user["email"], 18);
-            }
+            } */
+            $UsersModel = new UserModel();
+        
+            $email = $_SESSION['email'];
+            
+            
+            $user = $UsersModel->where('email', $email)->first();
+            $user["m"] = ellipsize($user["email"], 18);
         } else {
             $user = [];
         }
-        print_r($user);exit;
+        // print_r($user);exit;
         // print_r(json_decode($r, true));exit;
         return view('dashboard', ["plans" => $planos, "user" => $user, "pd" => $this->pageData]);
     }
@@ -85,27 +92,29 @@ class Home extends BaseController
             // echo "<pre>";
             // print_r($_SESSION);
             // echo "</pre>";
-            $args = [];
+            /* $args = [];
             $args["m"] = "GET";
             $this->requestURL = $this->baseApi . "customers";
             $args["pl"] = json_encode([
-                "query" => $_SESSION['email']
+                "query" => $_SESSION['email'],
+                "limit" => 1
             ]);
-            $result = $this->doRequest($this->requestURL, $args);
-            
-            $result = json_decode($result, true);
-            
+            $user = $this->doRequest($this->requestURL, $args);
+            // echo gettype(json_decode($user, true));exit;
+            $u = json_decode($user, true);
+            unset($user);
             $user = [];
-            if($result["totalItems"] > 0) {
-                $users = $result['items'];
-                foreach($users as $u) {
-                    if($u["email"] == $_SESSION['email']) {
-                        $user = $u;
-                        $user["m"] = ellipsize($user["email"], 18);
-                        break;
-                    }
-                }
-            }
+            if($u["totalItems"] > 0) {
+                $user = $u['items'][0];
+                $user["m"] = ellipsize($user["email"], 18);
+            } */
+            $UsersModel = new UserModel();
+        
+            $email = $_SESSION['email'];
+            
+            
+            $user = $UsersModel->where('email', $email)->first();
+            $user["m"] = ellipsize($user["email"], 18);
         } else {
             $user = [];
         }
@@ -151,27 +160,29 @@ class Home extends BaseController
             // echo "<pre>";
             // print_r($_SESSION);
             // echo "</pre>";
-            $args = [];
+            /* $args = [];
             $args["m"] = "GET";
             $this->requestURL = $this->baseApi . "customers";
             $args["pl"] = json_encode([
-                "query" => $_SESSION['email']
+                "query" => $_SESSION['email'],
+                "limit" => 1
             ]);
-            $result = $this->doRequest($this->requestURL, $args);
-            
-            $result = json_decode($result, true);
-            
+            $user = $this->doRequest($this->requestURL, $args);
+            // echo gettype(json_decode($user, true));exit;
+            $u = json_decode($user, true);
+            unset($user);
             $user = [];
-            if($result["totalItems"] > 0) {
-                $users = $result['items'];
-                foreach($users as $u) {
-                    if($u["email"] == $_SESSION['email']) {
-                        $user = $u;
-                        $user["m"] = ellipsize($user["email"], 18);
-                        break;
-                    }
-                }
-            }
+            if($u["totalItems"] > 0) {
+                $user = $u['items'][0];
+                $user["m"] = ellipsize($user["email"], 18);
+            } */
+            $UsersModel = new UserModel();
+        
+            $email = $_SESSION['email'];
+            
+            
+            $user = $UsersModel->where('email', $email)->first();
+            $user["m"] = ellipsize($user["email"], 18);
         } else {
             $user = [];
         }
@@ -210,14 +221,13 @@ class Home extends BaseController
             }
         }
         session();
-        echo "<pre>";
-        print_r($_SESSION['email']);exit;
+        // echo "<pre>";
+        // print_r($_SESSION['email']);exit;
         if(isset($_SESSION['email'])) {
-            echo "<pre>";
-            print_r($_SESSION);
-            echo "</pre>";
-            $args = [];
-            $args["m"] = "GET";
+            // echo "<pre>";
+            // print_r($_SESSION);
+            // echo "</pre>";
+            /* $args["m"] = "GET";
             $this->requestURL = $this->baseApi . "customers";
             $args["pl"] = json_encode([
                 "query" => $_SESSION['email'],
@@ -231,7 +241,14 @@ class Home extends BaseController
             if($u["totalItems"] > 0) {
                 $user = $u['items'][0];
                 $user["m"] = ellipsize($user["email"], 18);
-            }
+            } */
+            $UsersModel = new UserModel();
+        
+            $email = $_SESSION['email'];
+            
+            
+            $user = $UsersModel->where('email', $email)->first();
+            $user["m"] = ellipsize($user["email"], 18);
         } else {
             $user = [];
         }
