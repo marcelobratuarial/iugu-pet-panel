@@ -3,6 +3,7 @@
 namespace App\Controllers;
 use CodeIgniter\API\ResponseTrait;
 use App\Models\PetModel;
+use App\Models\DeletedPlanModel;
 use App\Models\UserModel;
 class Home extends BaseController
 {
@@ -200,26 +201,42 @@ class Home extends BaseController
         $args = [];
         $this->requestURL = $this->baseApi . "plans?limit=10";
         $args["m"] = "GET";
-        // $args["pl"] = [
-
-        // ];
+        $args["pl"] = json_encode([
+        ]);
         // if(in_array($rdata->method, ["POST", "PUT"]) && !isset($rdata->payload)) {
         //     throw new \Exception("invalid payload");
         // } else if(in_array($rdata->method, ["POST", "PUT"]) && isset($rdata->payload)) {
         //     $args["pl"] = json_encode($rdata->payload);
         // }
         $r = $this->doRequest($this->requestURL, $args);
+        // print_r($r);exit;
         $planos = json_decode($r, true)["items"];
         // echo "<pre>";
-        foreach($planos as $i=>$plan) {
-            if(count($plan['prices']) == 1) {
-                $plan["price_cents"] = $plan["prices"][0]['value_cents'];
+        $delPlanModel = new DeletedPlanModel();
+        $dp = $delPlanModel->findAll();
+        $dpids = [];
+        foreach($dp as $p) {
+            $dpids[] = $p["plan_id"];
             
-                $decimal = number_format(($plan['price_cents'] /100), 2, '.', ' ');
-                $planos[$i]['decimal'] = $decimal;
-                $planos[$i]['real'] = number_to_currency($decimal, $plan["prices"][0]['currency'], null, 2);
-            }
         }
+        // print_r($planos);exit;
+        foreach($planos as $i=>$plan) {
+            if(!in_array($plan["id"],$dpids)) {
+                // echo "entra";
+                if(count($plan['prices']) == 1) {
+                    $plan["price_cents"] = $plan["prices"][0]['value_cents'];
+                
+                    $decimal = number_format(($plan['price_cents'] /100), 2, '.', ' ');
+                    $planos[$i]['decimal'] = $decimal;
+                    $planos[$i]['real'] = number_to_currency($decimal, $plan["prices"][0]['currency'], null, 2);
+                }
+            } else {
+                unset($planos[$i]);
+                // echo "não entra";
+            }
+            
+        }
+        // print_r($planos);exit;
         session();
         // echo "<pre>";
         // print_r($_SESSION['email']);exit;
@@ -252,7 +269,7 @@ class Home extends BaseController
         } else {
             $user = [];
         }
-        // print_r($user);exit;
+        // print_r($planos);exit;
         // print_r(json_decode($r, true));exit;
         return view('plans', ["plans" => $planos, "user" => $user, "pd" => $this->pageData]);
     }
@@ -637,6 +654,35 @@ class Home extends BaseController
                         $assinatura['logs'][$i]['data'] = $data;
                     endforeach;
                     return $this->response->setJSON($assinatura);
+                    // return $this->response->setJSON($this->requestURL);
+                    // exit;
+                    // $rdata["payload"]["suspend_on_invoice_expired"] = true;
+                    // $rdata["payload"]["only_charge_on_due_date"] = false;
+                    // $rdata["payload"]["only_on_charge_success"] = true;
+                } else if (preg_match_all('/^plans/', $rdata["call"]) && $rdata["method"] == "DELETE") {
+                    $this->requestURL = $this->baseApi . "plans/" . $rdata["payload"]['id'];
+                    // print_r($rdata);
+                    $args = [];
+                    $args["m"] = $rdata["method"];
+                    $args["pl"] = json_encode($rdata["payload"]);
+                    // print_r($args);
+                    // print_r($this->requestURL);exit;
+                    
+                    $deletePlan = json_decode($this->doRequest($this->requestURL, $args),true);
+                    if(gettype($deletePlan) == 'array' && isset($deletePlan['id'])) {
+                        // echo "entrou";
+                        $delPlanModel = new DeletedPlanModel();
+                        $d = [
+                            "plan_id" => $deletePlan["id"]
+                        ];
+                        try {
+                            $delPlanModel->save($d);
+                            $delPlanModel->where("timestampdiff(hour, deleted_at, current_timestamp) > 1")->delete();
+                        } catch(\Exception $e) {
+                            print_r($e);exit;
+                        }
+                    }
+                    return $this->response->setJSON($deletePlan);
                     // return $this->response->setJSON($this->requestURL);
                     // exit;
                     // $rdata["payload"]["suspend_on_invoice_expired"] = true;

@@ -31,7 +31,7 @@
     <!--end breadcrumb-->
 
     <div class="pricing-table">
-        <h6 class="mb-0 text-uppercase">GERENCIAR PLANOS</h6>
+        <h6 class="mb-0 text-uppercase">GERENCIAR PLANOS <a href="<?= base_url("planos/add") ?>" class="btn btn-success btn-sm radius-30">Adicionar plano <i class='bx bx-plus me-2'></i></a></h6>
         <hr/>
         <div class="row row-cols-1 row-cols-lg-3">
             <?php if(isset($plans) && !empty($plans)) : ?>
@@ -57,7 +57,7 @@
                             </div>
                             <div class="card-footer">
                                 <a href="<?= base_url("planos/edit/".$plan['id']) ?>" class="btn btn-info my-2 radius-30">Editar <i class='bx bx-edit-alt me-2 font-18'></i></a>
-                                <a href="#" class="btn btn-danger my-2 radius-30">Deletar <i class='bx bx-trash me-2 font-18'></i></a>
+                                <a href="#" data-plan-id="<?=$plan["id"]?>" data-plan-name="<?=$plan["name"]?>" class="btn btn-danger delete-plan-btn my-2 radius-30">Deletar <i class='bx bx-trash me-2 font-18'></i></a>
                                 <!-- <div class="d-grid">
                                 </div> -->
                             </div>
@@ -71,6 +71,167 @@
     </div>
 </div>
 
+<!-- Modal -->
+<div class="modal fade" data-bs-backdrop="static" id="DeletePlanModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Excluir plano</h5>
+                <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+            </div>
+            <div class="modal-body">
+                <h1 class="display-6">Confirma?</h1>
+                <p class="lead">
+                Você realmente deseja <strong>excluir</strong> o plano <strong class="modal-plan-name"></strong>?
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" style="margin-right: 0" class="cancelar-excluir-plano-btn btn btn-sm btn-outline-success radius-30" data-bs-dismiss="modal"><i style="margin-right: 0" class="bx bx-x-circle"></i> Cancelar</button>
+                <form action="" id="confirmDelPlanForm">
+                    <input type="hidden" id="h-plan-id" name="plan_id">
+                    <input type="hidden" id="h-plan-name" name="plan_name">
+                    <button type="submit" class="btn btn-sm btn-outline-danger confirmar-excluir-plano-btn radius-30">Excluir <i style="margin-right: 0" class="bx bx-x"></i></button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="SuccessModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content bg-success">
+            <!-- <div class="modal-header">
+                <h5 class="modal-title">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div> -->
+            <div class="modal-body text-light text-center">
+                <h3 class="text-light"><i style="font-size: 3.5rem" class="bx bx-check"></i> <br>Concluído</h3>
+            </div>
+            <!-- <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
+            </div> -->
+        </div>
+    </div>
+</div>
+<?= $this->endSection() ?>
+
+<?= $this->section('scripts') ?>
+<script src="<?= base_url("panel/assets/plugins/Drag-And-Drop/dist/imageuploadify.min.js") ?>"></script>
+<script src="<?= base_url("panel/assets/js/jquery.maskMoney.min.js") ?>"></script>
+<script>
+    $(document).ready(function() {
+        $('#image-uploadify').imageuploadify();
+        $('[data-bs-toggle="tooltip"]').tooltip();
+
+        $('#DeletePlanModal').on('hidden.bs.modal', function (e) {
+            $("#DeletePlanModal .modal-plan-name").html("[...]")
+        })
+        $(".delete-plan-btn").on("click", function(e) {
+            e.preventDefault()
+            var plan_name = $(this).data("plan-name")
+            var plan_id = $(this).data("plan-id")
+            $("#DeletePlanModal .modal-plan-name").html(plan_name)
+            $("#DeletePlanModal #h-plan-id").val(plan_id)
+            $("#DeletePlanModal #h-plan-name").val(plan_name)
+            $("#DeletePlanModal").modal("show")
+        })
+        $("#DeletePlanModal").on("submit", "#confirmDelPlanForm", function(e) {
+            e.preventDefault()
+
+            $('.confirmar-excluir-plano-btn').addClass('disabled')
+            $('.confirmar-excluir-plano-btn').attr('disabled', true)
+            $('.confirmar-excluir-plano-btn').html('Aguarde... <i class="bx bx-loader-circle bx-spin"></i>')
+            
+            $('.cancelar-excluir-plano-btn').addClass('disabled')
+            $('.cancelar-excluir-plano-btn').attr('disabled', true)
+            
+            $('.genericOverlay').fadeIn(50)
+            var s = $(this).serializeArray()
+            // console.log(s)
+            // return
+            var url = '<?= base_url('/api') ?>';
+            var payload = {
+                'call': 'plans/'+$("#DeletePlanModal #h-plan-id").val(),
+                'method': 'DELETE',
+                'payload': {
+                    id: $("#DeletePlanModal #h-plan-id").val()
+                }
+            }
+            
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: payload,
+                fail: function(r) {
+                    console.log(r)
+                },
+                success: function(response) {
+                    console.log(response)
+                    // console.log(typeof response.error)
+                    if (response.error) {
+
+
+
+
+
+                    } else {
+
+                        
+                        $("#SuccessModal").modal("show")
+                        setTimeout(() => {
+                            $("#SuccessModal").modal("hide")
+                            window.location.href = "<?= base_url('/planos') ?>"
+                        }, 2500);
+                    }
+                    $('.save-plan-btn').removeClass('disabled')
+                    $('.save-plan-btn').removeAttr('disabled')
+                    $('.save-plan-btn').html('Salvar plano')
+                    $('.features-loading').fadeOut(1000)
+                    $('.genericOverlay').fadeOut(1000)
+                },
+                dataType: 'json',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+           
+        })
+
+    })
+
+    
+    $("body").off("paste", "[contenteditable]").on("paste", "[contenteditable]", function(e) {
+        e.preventDefault();
+        let text = "";
+        
+        text = e.originalEvent.clipboardData.getData("text/plain");
+        document.execCommand("insertHTML", false, text);
+    
+        if (text !== null && text.trim().length > 0) {
+            $(this).siblings( /* Fake Placeholder */ ).hide();
+        }
+    });
+
+
+    $("#inputPrice").maskMoney({
+        prefix: 'R$ ',
+        thousands: '.',
+        decimal: ',',
+        precision: 2,
+        allowZero: true,
+        affixesStay: true
+    });
+    var sl = function(t) {
+        return t
+            .toLowerCase()
+            .replace(/[^\w ]+/g, '')
+            .replace(/ +/g, '_');
+    }
+</script>
+<?php //$this->include('layouts/main/parts/footer') 
+?>
 <?= $this->endSection() ?>
 
 <?= $this->section('footer') ?>

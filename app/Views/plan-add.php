@@ -40,7 +40,7 @@
             ?>
             <div class="form-body mt-4">
 
-                <form action="" id="editPlanForm">
+                <form action="" id="addPlanForm">
                     <div class="row">
                         <div class="col-lg-8">
                             <div class="border position-relative border-3 p-4 rounded">
@@ -288,7 +288,7 @@
         $('#AddFeatureModal').on('hidden.bs.modal', function (e) {
             $("#addFeatureForm")[0].reset()
         })
-        $("#editPlanForm").on("submit", function(e) {
+        $("#addPlanForm").on("submit", function(e) {
             e.preventDefault()
 
             $('.save-plan-btn').addClass('disabled')
@@ -401,7 +401,7 @@
                         $("#SuccessModal").modal("show")
                         setTimeout(() => {
                             $("#SuccessModal").modal("hide")
-
+                            window.location.href = "<?= base_url('/planos/edit') ?>/"+response.id
                         }, 2500);
                     }
                     $('.save-plan-btn').removeClass('disabled')
