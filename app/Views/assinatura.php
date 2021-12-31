@@ -71,36 +71,41 @@
           </ul>
         </div>
       </div>
-    </div>
-    <div class="col-lg-8">
-      <div class="row mb-5 d-flex justify-content-center">
-        <div class="col-6">
-          <div class="card mb-5 mb-lg-0">
-            <div class="card-header bg-primary py-3"><?php //print_r($plan) ?>
-              <h5 class="card-title text-white text-uppercase text-center"><?= $assinatura['plano']['name'] ?></h5>
-              <h6 class="card-price text-white text-center"><?= $assinatura['plano']['prices'][0]['real'] ?><span class="term">/mês</span></h6>
-            </div>
-            <div class="card-body">
-              <?php if(isset($assinatura['plano']["features"]) && !empty($assinatura['plano']["features"])) : ?>
-              <ul class="list-group list-group-flush">
-                <?php foreach($assinatura['plano']["features"] as $feature) : ?>
-                <li class="list-group-item"><i class='bx bx-check me-2 font-18'></i><?= $feature['name'] ?></li>
-                <?php endforeach ?>
-              </ul>
-              <?php else : ?>
-              Nenhum recurso
-              <?php endif; ?>
-              <!-- <div class="d-grid"> <a href="#" class="btn btn-success my-2 radius-30">ASSINAR</a>
-                                    </div> -->
-            </div>
-            <div class="card-footer">
-              <a href="<?= base_url("planos/edit/".$assinatura['plano']['id']) ?>" class="btn btn-info my-2 radius-30">Editar <i
-                  class='bx bx-edit-alt me-2 font-18'></i></a>
-              
+
+      <hr>
+      <div class="pricing-table">
+        <div class="row mb-5 d-flex justify-content-center">
+          <div class="col-12">
+            <div class="card mb-5 mb-lg-0">
+              <div class="card-header bg-primary py-3"><?php //print_r($plan) ?>
+                <h5 class="card-title text-white text-uppercase text-center"><?= $assinatura['plano']['name'] ?></h5>
+                <h6 class="card-price text-white text-center"><?= $assinatura['plano']['prices'][0]['real'] ?><span class="term">/mês</span></h6>
+              </div>
+              <div class="card-body">
+                <?php if(isset($assinatura['plano']["features"]) && !empty($assinatura['plano']["features"])) : ?>
+                <ul class="list-group list-group-flush">
+                  <?php foreach($assinatura['plano']["features"] as $feature) : ?>
+                  <li class="list-group-item"><i class='bx bx-check me-2 font-18'></i><?= $feature['name'] ?></li>
+                  <?php endforeach ?>
+                </ul>
+                <?php else : ?>
+                Nenhum recurso
+                <?php endif; ?>
+                <!-- <div class="d-grid"> <a href="#" class="btn btn-success my-2 radius-30">ASSINAR</a>
+                                      </div> -->
+              </div>
+              <div class="card-footer">
+                <a href="<?= base_url("planos/edit/".$assinatura['plano']['id']) ?>" class="btn btn-info my-2 radius-30">Editar <i
+                    class='bx bx-edit-alt me-2 font-18'></i></a>
+                
+              </div>
             </div>
           </div>
         </div>
       </div>
+    </div>
+    <div class="col-lg-8">
+      
       
       <div class="row">
         <div class="col-sm-12">

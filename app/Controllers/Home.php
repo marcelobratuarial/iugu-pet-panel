@@ -373,22 +373,29 @@ class Home extends BaseController
             // echo "<pre>";
             // print_r($_SESSION);
             // echo "</pre>";
-            $args = [];
-            $args["m"] = "GET";
-            $this->requestURL = $a->baseApi . "customers";
-            $args["pl"] = json_encode([
-                "query" => $_SESSION['email'],
-                "limit" => 1
-            ]);
-            $user = $a->doRequest($this->requestURL, $args);
-            // echo gettype(json_decode($user, true));exit;
-            $u = json_decode($user, true);
-            unset($user);
-            $user = [];
-            if($u["totalItems"] > 0) {
-                $user = $u['items'][0];
-                $user["m"] = ellipsize($user["email"], 18);
-            }
+            // $args = [];
+            // $args["m"] = "GET";
+            // $this->requestURL = $a->baseApi . "customers";
+            // $args["pl"] = json_encode([
+            //     "query" => $_SESSION['email'],
+            //     "limit" => 1
+            // ]);
+            // $user = $a->doRequest($this->requestURL, $args);
+            // // echo gettype(json_decode($user, true));exit;
+            // $u = json_decode($user, true);
+            // unset($user);
+            // $user = [];
+            // if($u["totalItems"] > 0) {
+            //     $user = $u['items'][0];
+            //     $user["m"] = ellipsize($user["email"], 18);
+            // }
+            $UsersModel = new UserModel();
+        
+            $email = $_SESSION['email'];
+            
+            
+            $user = $UsersModel->where('email', $email)->first();
+            $user["m"] = ellipsize($user["email"], 18);
         } else {
             $user = [];
         }
