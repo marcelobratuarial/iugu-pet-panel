@@ -420,19 +420,19 @@ class Home extends BaseController
         if(isset($assinatura["errors"])) {
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }
-        $args = [];
-        $this->requestURL = $a->baseApi . "plans/identifier/".$assinatura["plan_identifier"];
-        $args["m"] = "GET";
-        $args["pl"] = json_encode([
-            "identifier" => $assinatura["plan_identifier"]
-        ]);
+        // $args = [];
+        // $this->requestURL = $a->baseApi . "plans/identifier/".$assinatura["plan_identifier"];
+        // $args["m"] = "GET";
+        // $args["pl"] = json_encode([
+        //     "identifier" => $assinatura["plan_identifier"]
+        // ]);
         
-        $plano = $a->doRequest($this->requestURL, $args);
-        $assinatura["plano"] = json_decode($plano, true);
+        // $plano = $a->doRequest($this->requestURL, $args);
+        // $assinatura["plano"] = json_decode($plano, true);
         
-        $decimal = number_format(($assinatura["plano"]["prices"][0]['value_cents'] /100), 2, '.', ' ');
-        $assinatura["plano"]["prices"][0]['decimal'] = $decimal;
-        $assinatura["plano"]["prices"][0]['real'] = number_to_currency($decimal, $assinatura["plano"]["prices"][0]['currency'], null, 2);
+        // $decimal = number_format(($assinatura["plano"]["prices"][0]['value_cents'] /100), 2, '.', ' ');
+        // $assinatura["plano"]["prices"][0]['decimal'] = $decimal;
+        // $assinatura["plano"]["prices"][0]['real'] = number_to_currency($decimal, $assinatura["plano"]["prices"][0]['currency'], null, 2);
 
         // $assinatura["pet"] = $petAssinatura;
         // print_r($assinatura);exit;

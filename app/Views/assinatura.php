@@ -31,7 +31,7 @@
     </div>
   </div>
   <!--end breadcrumb-->
-  <?php //print_r($assinatura)?>
+  <?php //print_r($assinatura);exit;?>
   <div class="row">
     <div class="col-lg-4">
       <div class="card">
@@ -78,13 +78,19 @@
           <div class="col-12">
             <div class="card mb-5 mb-lg-0">
               <div class="card-header bg-primary py-3"><?php //print_r($plan) ?>
-                <h5 class="card-title text-white text-uppercase text-center"><?= $assinatura['plano']['name'] ?></h5>
-                <h6 class="card-price text-white text-center"><?= $assinatura['plano']['prices'][0]['real'] ?><span class="term">/mês</span></h6>
+                <h5 class="card-title text-white text-uppercase text-center">
+                  <?php if(strlen($assinatura['plan_ref']) > 0) : ?>
+                  <?= $assinatura['plan_ref'] ?>
+                  <?php else: ?>
+                    [excluído]
+                  <?php endif ?>
+                </h5>
+                <h6 class="card-price text-white text-center"><?= $assinatura['real'] ?><span class="term">/mês</span></h6>
               </div>
               <div class="card-body">
-                <?php if(isset($assinatura['plano']["features"]) && !empty($assinatura['plano']["features"])) : ?>
+                <?php if(isset($assinatura["features"]) && !empty($assinatura["features"])) : ?>
                 <ul class="list-group list-group-flush">
-                  <?php foreach($assinatura['plano']["features"] as $feature) : ?>
+                  <?php foreach($assinatura["features"] as $feature) : ?>
                   <li class="list-group-item"><i class='bx bx-check me-2 font-18'></i><?= $feature['name'] ?></li>
                   <?php endforeach ?>
                 </ul>
@@ -95,7 +101,7 @@
                                       </div> -->
               </div>
               <div class="card-footer">
-                <a href="<?= base_url("planos/edit/".$assinatura['plano']['id']) ?>" class="btn btn-info my-2 radius-30">Editar <i
+                <a href="" class="btn btn-info my-2 radius-30">Editar <i
                     class='bx bx-edit-alt me-2 font-18'></i></a>
                 
               </div>
