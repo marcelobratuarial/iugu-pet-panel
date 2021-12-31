@@ -123,7 +123,7 @@
                 <div class="d-flex align-items-center justify-content-center"><i
                     class="bx bx-loader-alt bx-spin mr-3 font-24"></i> Carregando...</div>
               </div>
-              <div class="invouce-status-badge">
+              <div class="invouce-status-badge py-0 px-4 border border-1 border-success text-success text-center rounded bg-light">
               </div>
               <h6 class="mb-3 mt-5">Dados da fatura</h6>
               <ul class="list-group list-group-flush">
@@ -228,14 +228,9 @@
   position: absolute;
   top: 10px;
   right: 10px;
-  background-color: green;
   font-size: 1.2rem;
-  color: #fff;
-  padding: 4px 28px;
   display: inline-block;
   margin-bottom: 30px;
-  border-radius: 50px;
-  border: solid 1px #041a04;
 }
 </style>
 <?= $this->endSection() ?>
