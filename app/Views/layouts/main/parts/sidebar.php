@@ -26,6 +26,13 @@
                 <div class="menu-title">Planos</div>
             </a>
         </li>
+        <li>
+            <a href="<?= base_url('assinaturas') ?>">
+                <div class="parent-icon"><i class="bx bx-diamond"></i>
+                </div>
+                <div class="menu-title">Assinaturas</div>
+            </a>
+        </li>
         <!-- <li>
             <a href="javascript:;" class="has-arrow">
                 <div class="parent-icon"><i class='bx bx-home-circle'></i>
@@ -39,7 +46,7 @@
                 </li>
             </ul>
         </li> -->
-        <li>
+        <!-- <li>
             <a href="javascript:;" class="has-arrow">
                 <div class="parent-icon"><i class="bx bx-category"></i>
                 </div>
@@ -333,7 +340,7 @@
                 <div class="menu-title">Support</div>
             </a>
         </li>
-    </ul>
+    </ul> -->
     <!--end navigation-->
 </div>
 <!--end sidebar wrapper -->

@@ -273,6 +273,203 @@ class Home extends BaseController
         // print_r(json_decode($r, true));exit;
         return view('plans', ["plans" => $planos, "user" => $user, "pd" => $this->pageData]);
     }
+
+    public function assinaturas()
+    {
+        helper(['text',"number"]);
+        $this->pageData["title"] = "Assinaturas";
+        
+        // echo base64_encode($this->k);exit;
+        $args = [];
+        $this->requestURL = $this->baseApi . "subscriptions?limit=10";
+        $args["m"] = "GET";
+        $args["pl"] = json_encode([
+        ]);
+        // if(in_array($rdata->method, ["POST", "PUT"]) && !isset($rdata->payload)) {
+        //     throw new \Exception("invalid payload");
+        // } else if(in_array($rdata->method, ["POST", "PUT"]) && isset($rdata->payload)) {
+        //     $args["pl"] = json_encode($rdata->payload);
+        // }
+        $r = $this->doRequest($this->requestURL, $args);
+        $assinaturas = json_decode($r, true)["items"];
+
+        
+
+        // print_r($assinaturas);exit;
+        // echo "<pre>";
+        // $delPlanModel = new DeletedPlanModel();
+        // $dp = $delPlanModel->findAll();
+        // $dpids = [];
+        // foreach($dp as $p) {
+        //     $dpids[] = $p["plan_id"];
+        // }
+        // print_r($assinaturas);exit;
+        foreach($assinaturas as $i=>$assinatura) {
+            // if(!in_array($assinatura["id"],$dpids)) {
+                // echo "entra";
+                // print_r($assinatura["recent_invoices"]);exit;
+            
+                $decimal = number_format(($assinatura['price_cents'] /100), 2, '.', ' ');
+                $assinaturas[$i]['decimal'] = $decimal;
+                $assinaturas[$i]['real'] = number_to_currency($decimal, $assinatura['currency'], null, 2);
+                $date = date_create($assinatura['cycled_at']);
+
+                $expi = date_create($assinatura['expires_at']);
+                $periodo = $date->format('d/m/Y') . ' ~ ' . $expi->format('d/m/Y');
+                // echo $periodo;
+                $assinaturas[$i]['periodo'] = $periodo;
+            // } else {
+                // unset($assinaturas[$i]);
+                // echo "não entra";
+            // }
+            
+        }
+        // print_r($assinaturas);exit;
+        session();
+        // echo "<pre>";
+        // print_r($_SESSION['email']);exit;
+        if(isset($_SESSION['email'])) {
+            // echo "<pre>";
+            // print_r($_SESSION);
+            // echo "</pre>";
+            /* $args["m"] = "GET";
+            $this->requestURL = $this->baseApi . "customers";
+            $args["pl"] = json_encode([
+                "query" => $_SESSION['email'],
+                "limit" => 1
+            ]);
+            $user = $this->doRequest($this->requestURL, $args);
+            // echo gettype(json_decode($user, true));exit;
+            $u = json_decode($user, true);
+            unset($user);
+            $user = [];
+            if($u["totalItems"] > 0) {
+                $user = $u['items'][0];
+                $user["m"] = ellipsize($user["email"], 18);
+            } */
+            $UsersModel = new UserModel();
+        
+            $email = $_SESSION['email'];
+            
+            
+            $user = $UsersModel->where('email', $email)->first();
+            $user["m"] = ellipsize($user["email"], 18);
+        } else {
+            $user = [];
+        }
+        // print_r($assinaturas);exit;
+        // print_r(json_decode($r, true));exit;
+        return view('assinaturas', ["assinaturas" => $assinaturas, "user" => $user, "pd" => $this->pageData]);
+    }
+    public function assinatura($id)
+    {
+        helper(["number", "text"]);
+        $this->pageData["title"] = "Detalhes da assinatura";
+        $a = new Home();
+        // // parent::Controller();
+        session();
+        // echo "<pre>";print_r($a->get("name"));exit;
+        if(isset($_SESSION['email'])) {
+            // echo "<pre>";
+            // print_r($_SESSION);
+            // echo "</pre>";
+            $args = [];
+            $args["m"] = "GET";
+            $this->requestURL = $a->baseApi . "customers";
+            $args["pl"] = json_encode([
+                "query" => $_SESSION['email'],
+                "limit" => 1
+            ]);
+            $user = $a->doRequest($this->requestURL, $args);
+            // echo gettype(json_decode($user, true));exit;
+            $u = json_decode($user, true);
+            unset($user);
+            $user = [];
+            if($u["totalItems"] > 0) {
+                $user = $u['items'][0];
+                $user["m"] = ellipsize($user["email"], 18);
+            }
+        } else {
+            $user = [];
+        }
+        // $petModel = new PetModel();
+        // $petAssinatura = $petModel
+        //     ->where("cid", $user['id'])
+        //     ->where("aid", $id)
+        //     ->first();
+        // print_r($petAssinatura);exit;
+        $args = [];
+        $this->requestURL = $a->baseApi . "subscriptions/".$id;
+        $args["m"] = "GET";
+        $args["pl"] = json_encode([
+            'id' => $id
+        ]);
+        // if(in_array($rdata->method, ["POST", "PUT"]) && !isset($rdata->payload)) {
+        //     throw new \Exception("invalid payload");
+        // } else if(in_array($rdata->method, ["POST", "PUT"]) && isset($rdata->payload)) {
+        //     $args["pl"] = json_encode($rdata->payload);
+        // }
+        $assinatura = json_decode($a->doRequest($this->requestURL, $args),true);
+        if(isset($assinatura["errors"])) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        }
+        $args = [];
+        $this->requestURL = $a->baseApi . "plans/identifier/".$assinatura["plan_identifier"];
+        $args["m"] = "GET";
+        $args["pl"] = json_encode([
+            "identifier" => $assinatura["plan_identifier"]
+        ]);
+        
+        $plano = $a->doRequest($this->requestURL, $args);
+        $assinatura["plano"] = json_decode($plano, true);
+        
+        $decimal = number_format(($assinatura["plano"]["prices"][0]['value_cents'] /100), 2, '.', ' ');
+        $assinatura["plano"]["prices"][0]['decimal'] = $decimal;
+        $assinatura["plano"]["prices"][0]['real'] = number_to_currency($decimal, $assinatura["plano"]["prices"][0]['currency'], null, 2);
+
+        // $assinatura["pet"] = $petAssinatura;
+        // print_r($assinatura);exit;
+        foreach($assinatura['recent_invoices'] as $i=> $ri): 
+            // print_r($ri);
+            if(is_numeric($ri['total'])) {
+                $decimal = number_format(($ri['total'] /100), 2, '.', ' ');
+                $assinatura['recent_invoices'][$i]['decimal'] = $decimal;
+            }
+            if($ri['status'] == 'paid') {
+                $assinatura['recent_invoices'][$i]['status'] = "Pago";
+            }
+            // 
+            // $assinatura['real'] = number_to_currency($decimal, $assinatura['currency'], null, 2);
+                // $assinatura['recent_invoices'][$i]['decimal'] = $decimal;
+            $due_date = date_create($ri['due_date']);
+            $data = $due_date->format('d/m/Y');
+            // // echo $due_date;
+            $assinatura['recent_invoices'][$i]['data'] = $data;
+        endforeach;
+
+        foreach($assinatura['logs'] as $i=> $log): 
+            $due_date = date_create($log['created_at']);
+            $data = $due_date->format('d/m/Y H:i:s');
+            // // echo $due_date;
+            $assinatura['logs'][$i]['data'] = $data;
+        endforeach;
+        // exit;
+        // print_r($assinatura['recent_invoices']);exit;
+        $decimal = number_format(($assinatura['price_cents'] /100), 2, '.', ' ');
+        $assinatura['decimal'] = $decimal;
+        // print_r($assinatura);exit;
+        $assinatura['real'] = number_to_currency($decimal, $assinatura['currency'], null, 2);
+        $date = date_create($assinatura['cycled_at']);
+        $expi = date_create($assinatura['expires_at']);
+        $periodo = $date->format('d/m/Y') . ' ~ ' . $expi->format('d/m/Y');
+        // echo $periodo;
+        $assinatura['periodo'] = $periodo;
+        
+        // print_r($assinatura);exit;
+        
+        return view('assinatura', ["assinatura" => $assinatura,true, "user" => $user, "pd" => $this->pageData]);
+
+    }
     public function mailTeste() {
         $conf = [
             'name' => "marcelo",
