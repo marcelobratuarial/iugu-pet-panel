@@ -11,7 +11,7 @@
         <ol class="breadcrumb mb-0 p-0">
           <li class="breadcrumb-item"><a href="<?= base_url("/") ?>"><i class="bx bx-home-alt"></i></a>
           </li>
-          <li class="breadcrumb-item active" aria-current="page">Todas as assinaturas</li>
+          <li class="breadcrumb-item active" aria-current="page">Detalhes da assinatura</li>
         </ol>
       </nav>
     </div>
