@@ -17,15 +17,14 @@
     </div>
     <div class="ms-auto">
       <div class="btn-group">
-        <button type="button" class="btn btn-primary">Settings</button>
         <button type="button" class="btn btn-primary split-bg-primary dropdown-toggle dropdown-toggle-split"
-          data-bs-toggle="dropdown"> <span class="visually-hidden">Toggle Dropdown</span>
+          data-bs-toggle="dropdown"><i class="bx bx-menu"></i> <span class="visually-hidden">Toggle Dropdown</span>
         </button>
-        <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-end"> <a class="dropdown-item"
-            href="javascript:;">Action</a>
-          <a class="dropdown-item" href="javascript:;">Another action</a>
+        <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-end"> <a class="reembolsar-fatura-btn dropdown-item"
+            href="javascript:;" ><i class="bx bx-money"></i> <span>Reembolsar</span></a>
+          <!-- <a class="dropdown-item" href="javascript:;">Another action</a>
           <a class="dropdown-item" href="javascript:;">Something else here</a>
-          <div class="dropdown-divider"></div> <a class="dropdown-item" href="javascript:;">Separated link</a>
+          <div class="dropdown-divider"></div> <a class="dropdown-item" href="javascript:;">Separated link</a> -->
         </div>
       </div>
     </div>
@@ -86,6 +85,7 @@
                   <?php endif ?>
                 </h5>
                 <h6 class="card-price text-white text-center"><?= $assinatura['real'] ?><span class="term">/mês</span></h6>
+                <h5 class="text-white text-center"><?=$assinatura['periodo']?></h5>
               </div>
               <div class="card-body">
                 <?php if(isset($assinatura["features"]) && !empty($assinatura["features"])) : ?>
@@ -203,6 +203,36 @@
   </div>
 </div>
 
+
+<!-- Modal -->
+<div class="modal fade" data-bs-backdrop="static" id="ReembolsarModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Reembolsar pagamento</h5>
+        <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+      </div>
+      <div class="modal-body">
+        <h1 class="display-6">Confirma?</h1>
+        <p class="lead">
+          Você realmente deseja <strong>realizar o reembolso</strong> desta fatura?
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" style="margin-right: 0"
+          class="cancelar-reembolso-btn btn btn-sm btn-outline-success radius-30" data-bs-dismiss="modal"><i
+            style="margin-right: 0" class="bx bx-x-circle"></i> Cancelar</button>
+        <form action="" id="confirmReembolsoFaturaForm">
+          <input type="hidden" id="h-fatura-id" name="fatura_id">
+          <button type="submit" class="btn btn-sm btn-outline-danger confirmar-reembolso-btn radius-30">Confirmar reembolso <i
+              style="margin-right: 0" class="bx bx-x"></i></button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <!-- Modal -->
 <div class="modal fade" id="SuccessModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-sm">
@@ -244,7 +274,7 @@ $(document).ready(function() {
   var pid = $("#plan_id").html()
   const statusList = {
     'paid': "Pago",
-    'canceled': "Cancelado",
+    'refunded': "Reembolsado",
     'pending': "Pendente",
     'expired': "Expirado"
   }
@@ -268,6 +298,12 @@ $(document).ready(function() {
       success: function(response) {
         console.log(response)
         $(".invoice-details-loading").slideUp(400)
+        $(".invouce-status-badge").addClass("border-warning").addClass("text-warning").removeClass("border-success").removeClass("text-success")
+        $(".reembolsar-fatura-btn").addClass("btn")
+        $(".reembolsar-fatura-btn").addClass("btn-light")
+        $(".reembolsar-fatura-btn").addClass("disabled")
+        $(".reembolsar-fatura-btn").attr("disabled", true)
+        $(".reembolsar-fatura-btn span").html("Reembolsado")
         var d = JSON.stringify(response)
 
         var status = response.status
@@ -332,6 +368,76 @@ $(document).ready(function() {
         'X-Requested-With': 'XMLHttpRequest'
       }
     });
+
+
+    $(".reembolsar-fatura-btn").on("click", function(e) {
+      e.preventDefault()
+      $("#ReembolsarModal #h-fatura-id").val(iid)
+      $("#ReembolsarModal").modal("show")
+    })
+
+    $("#ReembolsarModal").on("submit", "#confirmReembolsoFaturaForm", function(e) {
+      e.preventDefault()
+
+      $('.confirmar-reembolso-btn').addClass('disabled')
+      $('.confirmar-reembolso-btn').attr('disabled', true)
+      $('.confirmar-reembolso-btn').html('Aguarde... <i class="bx bx-loader-circle bx-spin"></i>')
+
+      $('.cancelar-reembolso-btn').addClass('disabled')
+      $('.cancelar-reembolso-btn').attr('disabled', true)
+      
+      $('.genericOverlay').fadeIn(50)
+      var s = $(this).serializeArray()
+      console.log(s)
+      // return
+      var url = '<?= base_url('/api') ?>';
+      var payload = {
+        'call': 'invoices/' + $("#ReembolsarModal #h-fatura-id").val() + '/refund',
+        'method': 'POST',
+        'payload': {
+          id: $("#ReembolsarModal #h-fatura-id").val()
+        }
+      }
+
+      $.ajax({
+        type: "POST",
+        url: url,
+        data: payload,
+        fail: function(r) {
+          console.log(r)
+        },
+        success: function(response) {
+          console.log(response)
+          // console.log(typeof response.error)
+          if (response.error) {
+
+
+
+
+
+          } else {
+
+
+            $("#SuccessModal").modal("show")
+            setTimeout(() => {
+              $("#SuccessModal").modal("hide")
+              // window.location.href = "<?= base_url('/planos') ?>"
+            }, 2500);
+          }
+          $('.save-plan-btn').removeClass('disabled')
+          $('.save-plan-btn').removeAttr('disabled')
+          $('.save-plan-btn').html('Salvar plano')
+          $('.features-loading').fadeOut(1000)
+          $('.genericOverlay').fadeOut(1000)
+        },
+        dataType: 'json',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      });
+
+
+    })
   }
 
   if (cid.length > 0) {
