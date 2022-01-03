@@ -328,7 +328,7 @@
                 let o = {
                     'name': $(v).find('span').html(),
                     'identifier': sl($(v).find('span').html()),
-                    'value': 0,
+                    'value': 1,
                     'position': i + 1
                 }
                 console.log($(v).data('fid'))

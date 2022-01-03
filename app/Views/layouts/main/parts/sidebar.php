@@ -28,9 +28,16 @@
         </li>
         <li>
             <a href="<?= base_url('assinaturas') ?>">
-                <div class="parent-icon"><i class="bx bx-diamond"></i>
+                <div class="parent-icon"><i class="bx bx-dollar-circle"></i>
                 </div>
                 <div class="menu-title">Assinaturas</div>
+            </a>
+        </li>
+        <li>
+            <a href="<?= base_url('clientes') ?>">
+                <div class="parent-icon"><i class="lni lni-users"></i>
+                </div>
+                <div class="menu-title">Clientes</div>
             </a>
         </li>
         <!-- <li>

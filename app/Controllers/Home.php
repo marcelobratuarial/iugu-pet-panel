@@ -476,6 +476,107 @@ class Home extends BaseController
         return view('assinatura', ["assinatura" => $assinatura,true, "user" => $user, "pd" => $this->pageData]);
 
     }
+
+
+
+    
+    public function customers()
+    {
+        helper(['text',"number"]);
+        $this->pageData["title"] = "Clientes";
+        
+        // echo base64_encode($this->k);exit;
+        $args = [];
+        $this->requestURL = $this->baseApi . "customers";
+        $args["m"] = "GET";
+        // $args["pl"] = json_encode([
+        // ]);
+        // if(in_array($rdata->method, ["POST", "PUT"]) && !isset($rdata->payload)) {
+        //     throw new \Exception("invalid payload");
+        // } else if(in_array($rdata->method, ["POST", "PUT"]) && isset($rdata->payload)) {
+        //     $args["pl"] = json_encode($rdata->payload);
+        // }
+        $r = $this->doRequest($this->requestURL, $args);
+        $customers = json_decode($r, true)["items"];
+
+        
+        $db = \Config\Database::connect('dbpet');
+		$query = "SELECT * FROM pets"; 
+		
+		$pets = $db->query($query)->getResultArray();
+        // print_r($qry);exit;
+        // echo "<pre>";
+        // $delPlanModel = new DeletedPlanModel();
+        // $dp = $delPlanModel->findAll();
+        $petlist = [];
+        foreach($pets as $pet) {
+            $petlist[$pet["cid"]][] = $pet;
+        }
+        // print_r($petlist);
+        foreach($customers as $i=>$customer) {
+            // print_r($customer["id"]);
+            if(isset($petlist[$customer["id"]])) {
+                // echo "tem";
+                $customers[$i]["pets"] = $petlist[$customer['id']];
+            } else {
+                // echo "Nao tem";
+            }
+            // if(!in_array($customer["id"],$dpids)) {
+                // echo "entra";
+                // print_r($customer["recent_invoices"]);exit;
+                /*
+                $decimal = number_format(($customer['price_cents'] /100), 2, '.', ' ');
+                $customers[$i]['decimal'] = $decimal;
+                $customers[$i]['real'] = number_to_currency($decimal, $customer['currency'], null, 2);
+                $date = date_create($customer['cycled_at']);
+
+                $expi = date_create($customer['expires_at']);
+                $periodo = $date->format('d/m/Y') . ' ~ ' . $expi->format('d/m/Y');
+                // echo $periodo;
+                $customers[$i]['periodo'] = $periodo; */
+            // } else {
+                // unset($customers[$i]);
+                // echo "não entra";
+            // }
+            
+        }
+        // print_r($customers);exit;
+        session();
+        // echo "<pre>";
+        // print_r($_SESSION['email']);exit;
+        if(isset($_SESSION['email'])) {
+            // echo "<pre>";
+            // print_r($_SESSION);
+            // echo "</pre>";
+            /* $args["m"] = "GET";
+            $this->requestURL = $this->baseApi . "customers";
+            $args["pl"] = json_encode([
+                "query" => $_SESSION['email'],
+                "limit" => 1
+            ]);
+            $user = $this->doRequest($this->requestURL, $args);
+            // echo gettype(json_decode($user, true));exit;
+            $u = json_decode($user, true);
+            unset($user);
+            $user = [];
+            if($u["totalItems"] > 0) {
+                $user = $u['items'][0];
+                $user["m"] = ellipsize($user["email"], 18);
+            } */
+            $UsersModel = new UserModel();
+        
+            $email = $_SESSION['email'];
+            
+            
+            $user = $UsersModel->where('email', $email)->first();
+            $user["m"] = ellipsize($user["email"], 18);
+        } else {
+            $user = [];
+        }
+        // print_r($customers);exit;
+        // print_r(json_decode($r, true));exit;
+        return view('customers', ["customers" => $customers, "user" => $user, "pd" => $this->pageData]);
+    }
     public function mailTeste() {
         $conf = [
             'name' => "marcelo",

@@ -44,6 +44,8 @@ $routes->get('/planos/add', 'Home::planoCreate/$1', ['filter' => 'authFilter']);
 $routes->get('/planos', 'Home::planos', ['filter' => 'authFilter']);
 $routes->get('/assinaturas', 'Home::assinaturas', ['filter' => 'authFilter']);
 $routes->get('/assinaturas/details/(:any)', 'Home::assinatura/$1', ['filter' => 'authFilter']);
+$routes->get('/clientes', 'Home::customers', ['filter' => 'authFilter']);
+$routes->get('/clientes/details/(:any)', 'Home::customer/$1', ['filter' => 'authFilter']);
 $routes->get('/services', 'Home::services');
 $routes->get('/assinar/(:any)', 'Home::assinar/$1');
 // $routes->get('/api', 'Home::api');
