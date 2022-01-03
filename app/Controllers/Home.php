@@ -199,10 +199,10 @@ class Home extends BaseController
         
         // echo base64_encode($this->k);exit;
         $args = [];
-        $this->requestURL = $this->baseApi . "plans?limit=10";
+        $this->requestURL = $this->baseApi . "plans";
         $args["m"] = "GET";
-        $args["pl"] = json_encode([
-        ]);
+        // $args["pl"] = json_encode([
+        // ]);
         // if(in_array($rdata->method, ["POST", "PUT"]) && !isset($rdata->payload)) {
         //     throw new \Exception("invalid payload");
         // } else if(in_array($rdata->method, ["POST", "PUT"]) && isset($rdata->payload)) {
@@ -219,7 +219,6 @@ class Home extends BaseController
             $dpids[] = $p["plan_id"];
             
         }
-        // print_r($planos);exit;
         foreach($planos as $i=>$plan) {
             if(!in_array($plan["id"],$dpids)) {
                 // echo "entra";
@@ -281,10 +280,10 @@ class Home extends BaseController
         
         // echo base64_encode($this->k);exit;
         $args = [];
-        $this->requestURL = $this->baseApi . "subscriptions?limit=10";
+        $this->requestURL = $this->baseApi . "subscriptions";
         $args["m"] = "GET";
-        $args["pl"] = json_encode([
-        ]);
+        // $args["pl"] = json_encode([
+        // ]);
         // if(in_array($rdata->method, ["POST", "PUT"]) && !isset($rdata->payload)) {
         //     throw new \Exception("invalid payload");
         // } else if(in_array($rdata->method, ["POST", "PUT"]) && isset($rdata->payload)) {

@@ -117,8 +117,8 @@
         <div class="col-sm-12">
           <div class="card">
             <div class="card-body position-relative">
-              <h5 class="d-flex align-items-center mb-3">Fatura</h5>
-
+              <h5 class="d-flex align-items-center mb-3">Fatura </h5>
+              
               <div class="invoice-details-loading">
                 <div class="d-flex align-items-center justify-content-center"><i
                     class="bx bx-loader-alt bx-spin mr-3 font-24"></i> Carregando...</div>
@@ -131,8 +131,9 @@
                 <li class="list-group-item lead fatura-due">Vencimento: <span></span></li>
                 <li class="list-group-item lead fatura-paid-at">Pagamento: <span></span></li>
                 <li class="list-group-item lead fatura-value">VALOR: <span></span></li>
-                <!-- <li class="list-group-item">Porta ac consectetur ac</li>
-                <li class="list-group-item">Vestibulum at eros</li> -->
+                <li class="list-group-item"><a class="radius-30 visualizar-fatura-btn btn btn-outline-info btn-sm" target="_blank" href=""> <i
+                    class='bx bx-link-external me-2 font-18'></i>Ver fatura</a></li>
+                <!--<li class="list-group-item">Vestibulum at eros</li> -->
               </ul>
               <hr>
               <h6 class="mb-3 mt-5">Dados do pagador</h6>
@@ -304,6 +305,7 @@ $(document).ready(function() {
         $(".reembolsar-fatura-btn").addClass("disabled")
         $(".reembolsar-fatura-btn").attr("disabled", true)
         $(".reembolsar-fatura-btn span").html("Reembolsado")
+        $(".visualizar-fatura-btn").attr("href", response.secure_url)
         var d = JSON.stringify(response)
 
         var status = response.status

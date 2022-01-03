@@ -321,7 +321,7 @@
             })
             var fs = $(".features-box > ul li").length
             // console.log(fs)
-
+            p['payable_with'] = ['credit_card']
             p['features'] = []
             $.each($(".features-box > ul li"), function(i, v) {
                 // console.log(v)

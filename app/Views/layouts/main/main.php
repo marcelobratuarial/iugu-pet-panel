@@ -134,6 +134,12 @@
     <script src="<?= base_url("panel/assets/plugins/vectormap/jquery-jvectormap-world-mill-en.js") ?>"></script>
 	<script src="<?= base_url("panel/assets/plugins/chartjs/js/Chart.min.js") ?>"></script>
 	<script src="<?= base_url("panel/assets/plugins/chartjs/js/Chart.extension.js") ?>"></script>
+	<script type="text/javascript" src="https://js.iugu.com/v2"></script>
+	<script>
+		Iugu.setAccountID("4F8D7432F6621AEF83D433C5E197F32E")
+		Iugu.setTestMode(true)
+		Iugu.setup()
+	</script>
 	<?= $this->renderSection('scripts') ?>
 	<!--app JS-->
 	<script src="<?= base_url("panel/assets/js/app.js")?>"></script>
