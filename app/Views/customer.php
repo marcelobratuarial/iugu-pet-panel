@@ -159,7 +159,7 @@
                             </div>
                           </div>
                         <?php else : ?>
-                          <span class="lead">Sem assinatura</span>
+                          <p class="lead">Sem assinatura</p>
                         <?php endif; ?>
                       </div>
                     </div>

@@ -663,11 +663,13 @@ class Home extends BaseController
             $subscriptionlist[$subscription["id"]][] = $subscription;
         }
 
+        $toStart = [];
+        $toEnd = [];
         foreach($customer["pets"] as $i => $pet) {
             // print_r($pet);
             // print_r($subscriptionlist);
             $nasc = date_create($pet['pet_nasc']);
-            $customer["pets"][$i]["nasc_br"] = $nasc->format('d/m/Y');
+            $pet["nasc_br"] = $nasc->format('d/m/Y');
             if(isset($subscriptionlist[$pet["aid"]])) {
                 $ass = $subscriptionlist[$pet["aid"]][0];
                 
@@ -680,10 +682,15 @@ class Home extends BaseController
                 $periodo = $date->format('d/m/Y') . ' ~ ' . $expi->format('d/m/Y');
                 // echo $periodo;
                 $ass['periodo'] = $periodo;
-                $customer["pets"][$i]['assinatura'] = $ass;
+                $pet["assinatura"] = $ass;
+                $toStart[] = $pet;
+            } else {
+                $toEnd[] = $pet;
             }
         }
-
+        $customer["pets"] = array_merge($toStart, $toEnd);
+        // print_r($customer);exit;
+        // $customer["pets"][$i]['assinatura'] = $ass;
         
             // if(!in_array($customer["id"],$dpids)) {
                 // echo "entra";
