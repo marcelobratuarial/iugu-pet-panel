@@ -56,8 +56,8 @@
                             </td>
                             <td><?= $assinatura['plan_name'] ?></td>
                             <td>
-                                <div class="badge rounded-pill <?= ($assinatura["active"]) ? " text-success bg-light-success" : (($assinatura["suspended"]) ? " text-warning bg-light-warning" : ' text-danger bg-light-danger') ?> p-2 text-uppercase px-3">
-                                <i class='bx bxs-circle me-1'></i><?= ($assinatura["active"]) ? "Ativo" : (($assinatura["suspended"]) ? "Suspenso" : 'Verificar') ?></div></td>
+                                <div class="badge rounded-pill <?= ($assinatura["status"] == 'active') ? " text-success bg-light-success" : ' text-danger bg-light-danger' ?> p-2 text-uppercase px-3">
+                                <i class='bx bxs-circle me-1'></i><?= ($assinatura["status"] == 'active') ? " Ativo" : ' Suspenso' ?></div></td>
                             <td><?= $assinatura['real'] ?><span class="term">/mês</span></td>
                             <td><?= $assinatura['periodo'] ?></td>
                             <td>

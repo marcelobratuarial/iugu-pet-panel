@@ -299,17 +299,22 @@ $(document).ready(function() {
       success: function(response) {
         console.log(response)
         $(".invoice-details-loading").slideUp(400)
-        $(".invouce-status-badge").addClass("border-warning").addClass("text-warning").removeClass("border-success").removeClass("text-success")
-        $(".reembolsar-fatura-btn").addClass("btn")
-        $(".reembolsar-fatura-btn").addClass("btn-light")
-        $(".reembolsar-fatura-btn").addClass("disabled")
-        $(".reembolsar-fatura-btn").attr("disabled", true)
-        $(".reembolsar-fatura-btn span").html("Reembolsado")
-        $(".visualizar-fatura-btn").attr("href", response.secure_url)
+        
+        
         var d = JSON.stringify(response)
 
         var status = response.status
         $(".invouce-status-badge").html(statusList[status])
+        if(status == 'refunded') {
+          $(".invouce-status-badge").addClass("border-warning").addClass("text-warning").removeClass("border-success").removeClass("text-success")
+          $(".reembolsar-fatura-btn").addClass("btn")
+          $(".reembolsar-fatura-btn").addClass("btn-light")
+          $(".reembolsar-fatura-btn").addClass("disabled")
+          $(".reembolsar-fatura-btn").attr("disabled", true)
+          $(".reembolsar-fatura-btn span").html("Reembolsado")
+          $(".visualizar-fatura-btn").attr("href", response.secure_url)
+        }
+        
 
         var created_at = new Date(response.created_at_iso);
         $(".fatura-created-at span").html(created_at.toLocaleString('pt-BR'))

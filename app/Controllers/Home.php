@@ -307,6 +307,7 @@ class Home extends BaseController
             // if(!in_array($assinatura["id"],$dpids)) {
                 // echo "entra";
                 // print_r($assinatura["recent_invoices"]);exit;
+                $assinaturas[$i]['status'] = ($assinatura['suspended']) ? 'suspended' : 'active';
             
                 $decimal = number_format(($assinatura['price_cents'] /100), 2, '.', ' ');
                 $assinaturas[$i]['decimal'] = $decimal;
