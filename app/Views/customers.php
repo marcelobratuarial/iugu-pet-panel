@@ -11,7 +11,7 @@
                 <ol class="breadcrumb mb-0 p-0">
                     <li class="breadcrumb-item"><a href="<?= base_url("/") ?>"><i class="bx bx-home-alt"></i></a>
                     </li>
-                    <li class="breadcrumb-item active" aria-current="page">Todas os clientes</li>
+                    <li class="breadcrumb-item active" aria-current="page">Todos os clientes</li>
                 </ol>
             </nav>
         </div>
@@ -56,9 +56,9 @@
                             <td><?= $customer['name'] ?></td>
                             
                             <td><?= count($customer['pets']) ?><span class="term"></span></td>
-                            <td>ass</td>
+                            <td><?= count($customer['assinaturas']) ?></td>
                             <td>
-                            <a href="<?= base_url("customers/details/".$customer['id']) ?>" class="btn btn-sm btn-info my-0 radius-30">Detalhes <i class='bx bx-detail me-2 font-18'></i></a>
+                            <a href="<?= base_url("clientes/details/".$customer['id']) ?>" class="btn btn-sm btn-info my-0 radius-30">Detalhes <i class='bx bx-detail me-2 font-18'></i></a>
                             </td>
                             <!-- <td>
                                 <div class="d-flex order-actions">

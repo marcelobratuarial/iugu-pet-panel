@@ -410,15 +410,31 @@ class Home extends BaseController
         $args["pl"] = json_encode([
             'id' => $id
         ]);
-        // if(in_array($rdata->method, ["POST", "PUT"]) && !isset($rdata->payload)) {
-        //     throw new \Exception("invalid payload");
-        // } else if(in_array($rdata->method, ["POST", "PUT"]) && isset($rdata->payload)) {
-        //     $args["pl"] = json_encode($rdata->payload);
-        // }
         $assinatura = json_decode($a->doRequest($this->requestURL, $args),true);
         if(isset($assinatura["errors"])) {
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }
+        // print_r($assinatura);exit;
+        $args = [];
+        $this->requestURL = $a->baseApi . "subscriptions";
+        $args["m"] = "GET";
+        $args["pl"] = json_encode([
+            'customer_id' => $assinatura["customer_id"]
+        ]);
+        $assinaturas = json_decode($a->doRequest($this->requestURL, $args),true);
+        if(isset($assinaturas["errors"])) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        }
+        
+        foreach($assinaturas['items'] as $a) {
+            if($a["id"] == $id) {
+                
+                $assinatura["plan_ref"] = $a['plan_ref'];
+                break;
+            }
+        };
+        // print_r($assinatura);
+        // exit;
         // $args = [];
         // $this->requestURL = $a->baseApi . "plans/identifier/".$assinatura["plan_identifier"];
         // $args["m"] = "GET";
@@ -512,12 +528,33 @@ class Home extends BaseController
         foreach($pets as $pet) {
             $petlist[$pet["cid"]][] = $pet;
         }
+
+        $args = [];
+        $this->requestURL = $this->baseApi . "subscriptions";
+        $args["m"] = "GET";
+        $args["pl"] = json_encode([
+            // "customer_id" => $customer['id']
+        ]);
+        
+        $r = $this->doRequest($this->requestURL, $args);
+        $subscriptions = json_decode($r, true)['items'];
+        $subscriptionlist = [];
+        foreach($subscriptions as $subscription) {
+            $subscriptionlist[$subscription["customer_id"]][] = $subscription;
+        }
+        // print_r($subscriptions);exit;
         // print_r($petlist);
         foreach($customers as $i=>$customer) {
             // print_r($customer["id"]);
             if(isset($petlist[$customer["id"]])) {
                 // echo "tem";
                 $customers[$i]["pets"] = $petlist[$customer['id']];
+            } else {
+                // echo "Nao tem";
+            }
+            if(isset($subscriptionlist[$customer["id"]])) {
+                // echo "tem";
+                $customers[$i]["assinaturas"] = $subscriptionlist[$customer['id']];
             } else {
                 // echo "Nao tem";
             }
@@ -540,7 +577,6 @@ class Home extends BaseController
             // }
             
         }
-        // print_r($customers);exit;
         session();
         // echo "<pre>";
         // print_r($_SESSION['email']);exit;
@@ -576,6 +612,132 @@ class Home extends BaseController
         // print_r($customers);exit;
         // print_r(json_decode($r, true));exit;
         return view('customers', ["customers" => $customers, "user" => $user, "pd" => $this->pageData]);
+    }
+
+    
+    public function customer($id)
+    {
+        helper(['text',"number"]);
+        $this->pageData["title"] = "Cliente";
+        
+        // echo base64_encode($this->k);exit;
+        $args = [];
+        $this->requestURL = $this->baseApi . "customers";
+        $args["m"] = "GET";
+        $args["pl"] = json_encode([
+            'customer_id' => $id
+        ]);
+        // if(in_array($rdata->method, ["POST", "PUT"]) && !isset($rdata->payload)) {
+        //     throw new \Exception("invalid payload");
+        // } else if(in_array($rdata->method, ["POST", "PUT"]) && isset($rdata->payload)) {
+        //     $args["pl"] = json_encode($rdata->payload);
+        // }
+        $r = $this->doRequest($this->requestURL, $args);
+        $customer = json_decode($r, true)["items"][0];
+
+        
+        $db = \Config\Database::connect('dbpet');
+		$query = "SELECT * FROM pets where cid = ?"; 
+		
+		$pets = $db->query($query, $customer["id"])->getResultArray();
+        $customer["pets"] = $pets;
+        // print_r($customer);exit;
+        // echo "<pre>";
+        // $delPlanModel = new DeletedPlanModel();
+        // $dp = $delPlanModel->findAll();
+        // $petlist = [];
+        
+
+        $args = [];
+        $this->requestURL = $this->baseApi . "subscriptions";
+        $args["m"] = "GET";
+        $args["pl"] = json_encode([
+            "customer_id" => $customer['id']
+        ]);
+        $r = $this->doRequest($this->requestURL, $args);
+        $subscriptions = json_decode($r, true)['items'];
+        // print_r($subscriptions);exit;
+        $subscriptionlist = [];
+        foreach($subscriptions as $subscription) {
+            $subscriptionlist[$subscription["id"]][] = $subscription;
+        }
+
+        foreach($customer["pets"] as $i => $pet) {
+            // print_r($pet);
+            // print_r($subscriptionlist);
+            $nasc = date_create($pet['pet_nasc']);
+            $customer["pets"][$i]["nasc_br"] = $nasc->format('d/m/Y');
+            if(isset($subscriptionlist[$pet["aid"]])) {
+                $ass = $subscriptionlist[$pet["aid"]][0];
+                
+                $decimal = number_format(($ass['price_cents'] /100), 2, '.', ' ');
+                $ass['decimal'] = $decimal;
+                $ass['real'] = number_to_currency($decimal, $ass['currency'], null, 2);
+                
+                $date = date_create($ass['cycled_at']);
+                $expi = date_create($ass['expires_at']);
+                $periodo = $date->format('d/m/Y') . ' ~ ' . $expi->format('d/m/Y');
+                // echo $periodo;
+                $ass['periodo'] = $periodo;
+                $customer["pets"][$i]['assinatura'] = $ass;
+            }
+        }
+
+        
+            // if(!in_array($customer["id"],$dpids)) {
+                // echo "entra";
+                // print_r($customer["recent_invoices"]);exit;
+                /*
+                $decimal = number_format(($customer['price_cents'] /100), 2, '.', ' ');
+                $customers[$i]['decimal'] = $decimal;
+                $customers[$i]['real'] = number_to_currency($decimal, $customer['currency'], null, 2);
+                $date = date_create($customer['cycled_at']);
+
+                $expi = date_create($customer['expires_at']);
+                $periodo = $date->format('d/m/Y') . ' ~ ' . $expi->format('d/m/Y');
+                // echo $periodo;
+                $customers[$i]['periodo'] = $periodo; */
+            // } else {
+                // unset($customers[$i]);
+                // echo "não entra";
+            // }
+            
+        
+        session();
+        // echo "<pre>";
+        // print_r($_SESSION['email']);exit;
+        if(isset($_SESSION['email'])) {
+            // echo "<pre>";
+            // print_r($_SESSION);
+            // echo "</pre>";
+            /* $args["m"] = "GET";
+            $this->requestURL = $this->baseApi . "customers";
+            $args["pl"] = json_encode([
+                "query" => $_SESSION['email'],
+                "limit" => 1
+            ]);
+            $user = $this->doRequest($this->requestURL, $args);
+            // echo gettype(json_decode($user, true));exit;
+            $u = json_decode($user, true);
+            unset($user);
+            $user = [];
+            if($u["totalItems"] > 0) {
+                $user = $u['items'][0];
+                $user["m"] = ellipsize($user["email"], 18);
+            } */
+            $UsersModel = new UserModel();
+        
+            $email = $_SESSION['email'];
+            
+            
+            $user = $UsersModel->where('email', $email)->first();
+            $user["m"] = ellipsize($user["email"], 18);
+        } else {
+            $user = [];
+        }
+        // print_r($customer);exit;
+        // print_r(json_decode($r, true));exit;
+        return view('customer', ["customer" => $customer, "user" => $user, "pd" => $this->pageData]);
     }
     public function mailTeste() {
         $conf = [
