@@ -14,6 +14,7 @@ class Home extends BaseController
     public $requestURL;
     protected $k;
     public $pageData;
+    public $dashData;
     
     public function __construct () {
         $this->baseApi = 'https://api.iugu.com/v1/';
@@ -23,6 +24,7 @@ class Home extends BaseController
         $this->requestURL = "";
         
         $this->pageData = [];
+        $this->dashData = [];
     }
 
     public function index()
@@ -31,22 +33,139 @@ class Home extends BaseController
 
         $this->pageData["title"] = "Dashboard";
 
+        $args = [];
+        $this->requestURL = $this->baseApi . "invoices?limit=10";
+        $args["m"] = "GET";
+        $args["pl"] = json_encode([
+        ]);
+        
+        $r = $this->doRequest($this->requestURL, $args);
+        $faturas = json_decode($r, true);
+        // echo "<pre>";
+        foreach($faturas['items'] as $i => $f) {
+            // print_r($f);
+            foreach($f["variables"] as $v) {
+                if($v["variable"] == "subscription_id") {
+                    unset($f["variables"]);
+                    $faturas['items'][$v["value"]] = $f;
+                    break;
+                }
+            }
+            // $faturas[$f["variables"]];
+            unset($faturas['items'][$i]);
+        }
+        print_r($faturas['items']);
+        exit;
         // echo base64_encode($this->k);exit;
         $args = [];
-        $this->requestURL = $this->baseApi . "plans?limit=10";
+        $this->requestURL = $this->baseApi . "plans";
         $args["m"] = "GET";
-        // $args["pl"] = [
-
-        // ];
-        // if(in_array($rdata->method, ["POST", "PUT"]) && !isset($rdata->payload)) {
-        //     throw new \Exception("invalid payload");
-        // } else if(in_array($rdata->method, ["POST", "PUT"]) && isset($rdata->payload)) {
-        //     $args["pl"] = json_encode($rdata->payload);
-        // }
+        $args["pl"] = json_encode([
+        ]);
+        
         $r = $this->doRequest($this->requestURL, $args);
-        $planos = json_decode($r, true)["items"];
+        $planos = json_decode($r, true);
+        // print_r($planos);exit;
+        $this->dashData["total_plans"] = $planos["totalItems"];
+        
+        $planList = [];
+        foreach($planos['items'] as $p) {
+            $planList[$p["identifier"]] = $p;
+            // var_dump($p);
+        }
+        // exit;
         // echo "<pre>";
+        // print_r($planList);exit;
+        $args = [];
+        $this->requestURL = $this->baseApi . "subscriptions";
+        $args["m"] = "GET";
+        $args["pl"] = json_encode([
+        ]);
+        
+        $r = $this->doRequest($this->requestURL, $args);
+        $assinaturas = json_decode($r, true);
+        // echo "<pre>";
+        print_r($assinaturas);exit;
+        $this->dashData["total_subs"] = $assinaturas["totalItems"];
 
+        $args = [];
+        $this->requestURL = $this->baseApi . "customers";
+        $args["m"] = "GET";
+        $args["pl"] = json_encode([
+        ]);
+        
+        $r = $this->doRequest($this->requestURL, $args);
+        $customers = json_decode($r, true);
+        $this->dashData["total_customers"] = $customers["totalItems"];
+        // echo "<pre>";
+        // print_r($customers);exit;
+
+        foreach($assinaturas["items"] as $ass) {
+            unset($ass["features"]);
+            unset($ass["logs"]);
+            unset($ass["custom_variables"]);
+            unset($ass["subitems"]);
+            $this->dashData["assinaturas"][$ass["plan_identifier"]][] = $ass;
+        }
+        
+        $this->dashData["planList"] = $planList;
+
+        $c2 = [];
+        $c2_r = [];
+        foreach($this->dashData["assinaturas"] as $identifier => $a) {
+            if(isset($this->dashData["planList"][$identifier])) {
+                // print_r($a);
+                $c2[$identifier]["name"] = $this->dashData["planList"][$identifier]["name"];
+                if(!isset($c2[$identifier]["items"])) {
+                    $c2[$identifier]["items"] = [];
+                }
+                // print_r($a);
+                $c2[$identifier]["items"] = $this->dashData["assinaturas"][$identifier];
+                
+                // $c2[$identifier]['n'] = count($c2[$identifier]["items"]);
+                // array_push
+                if(!isset($c2_r["labels"])) {
+                    $c2_r["labels"] = '';
+                }
+                if(!isset($c2_r["data"])) {
+                    $c2_r["data"] = '';
+                }
+                $c2_r["labels"] .= '"'.$c2[$identifier]["name"].'",';
+                $c2_r["data"] .= '"'.count($c2[$identifier]["items"]).'",';
+            
+                // array_push($c2[$identifier]["items"], $a);
+                // $c2[$identifier]["name"][''] = $this->dashData["planList"][$identifier]["name"];
+
+            }
+        }
+        $c2_r["labels"] = rtrim($c2_r["labels"], ',');
+        $c2_r["data"] = rtrim($c2_r["data"], ',');
+        // print_r($c2);exit;
+        $this->dashData["chart2"]["js"] = $c2_r;
+        $this->dashData["chart2"]["tb"] = $c2;
+        // [
+        //     'chart2'=> [
+        //         'bsico' => [
+        //             'name' => "Básico",
+        //             'item' => [
+        //                 [],
+        //                 []
+        //             ]
+        //         ]
+        //     ]
+        // ]
+        // foreach($this->dashData["assinaturas"] as $identifier => $a) :
+        //     if(isset($this->dashData["planList"][$identifier])): 
+                
+        //         $this->dashData["chart2"]["items"][$identifier]['n'] = count($this->dashData["chart2"]["items"][$identifier]['i']);
+        //         // array_push
+        //         $this->dashData["chart2"]["labels"] .= '"'.$this->dashData["planList"][$identifier]["name"].'",';
+        //         $this->dashData["chart2"]["data"] .= '"'.count($this->dashData["assinaturas"][$identifier]).'",';
+        //     endif;
+        // endforeach;
+        // $this->dashData["chart2"]["labels"] = rtrim($this->dashData["chart2"]["labels"], ',');
+        // $this->dashData["chart2"]["data"] = rtrim($this->dashData["chart2"]["data"], ',');
+        // print_r($this->dashData["chart2"]);exit;
         session();
         // echo "<pre>";print_r($a->get("name"));exit;
         if(isset($_SESSION['email'])) {
@@ -79,9 +198,9 @@ class Home extends BaseController
         } else {
             $user = [];
         }
-        // print_r($user);exit;
+        // print_r($this->dashData);exit;
         // print_r(json_decode($r, true));exit;
-        return view('dashboard', ["plans" => $planos, "user" => $user, "pd" => $this->pageData]);
+        return view('dashboard', ["plans" => $planos, "user" => $user, "pd" => $this->pageData, "dd" => $this->dashData]);
     }
 
     public function planoCreate()

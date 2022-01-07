@@ -9,9 +9,9 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div>
-                            <p class="mb-0 text-secondary">Total Orders</p>
-                            <h4 class="my-1 text-info">4805</h4>
-                            <p class="mb-0 font-13">+2.5% from last week</p>
+                            <p class="mb-0 text-secondary">Assinaturas</p>
+                            <h4 class="my-1 text-info"><?= $dd['total_subs'] ?></h4>
+                            <!-- <p class="mb-0 font-13">+2.5% from last week</p> -->
                         </div>
                         <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto"><i class='bx bxs-cart'></i>
                         </div>
@@ -54,9 +54,9 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div>
-                            <p class="mb-0 text-secondary">Total Customers</p>
-                            <h4 class="my-1 text-warning">8.4K</h4>
-                            <p class="mb-0 font-13">+8.4% from last week</p>
+                            <p class="mb-0 text-secondary">Clientes</p>
+                            <h4 class="my-1 text-warning"><?= $dd["total_customers"] ?></h4>
+                            <!-- <p class="mb-0 font-13">+8.4% from last week</p> -->
                         </div>
                         <div class="widgets-icons-2 rounded-circle bg-gradient-blooker text-white ms-auto"><i class='bx bxs-group'></i>
                         </div>
@@ -126,7 +126,7 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div>
-                            <h6 class="mb-0">Trending Products</h6>
+                            <h6 class="mb-0">Planos</h6>
                         </div>
                         <div class="dropdown ms-auto">
                             <a class="dropdown-toggle dropdown-toggle-nocaret" href="#" data-bs-toggle="dropdown"><i class='bx bx-dots-horizontal-rounded font-22 text-option'></i>
@@ -149,14 +149,11 @@
                     </div>
                 </div>
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex bg-transparent justify-content-between align-items-center">Jeans <span class="badge bg-success rounded-pill">25</span>
-                    </li>
-                    <li class="list-group-item d-flex bg-transparent justify-content-between align-items-center">T-Shirts <span class="badge bg-danger rounded-pill">10</span>
-                    </li>
-                    <li class="list-group-item d-flex bg-transparent justify-content-between align-items-center">Shoes <span class="badge bg-primary rounded-pill">65</span>
-                    </li>
-                    <li class="list-group-item d-flex bg-transparent justify-content-between align-items-center">Lingerie <span class="badge bg-warning text-dark rounded-pill">14</span>
-                    </li>
+                    <?php foreach($dd["chart2"]['tb'] as $i => $a) : ?>
+                        <li class="list-group-item d-flex bg-transparent justify-content-between align-items-center"><?= $a['name'] ?> <span class="badge bg-success rounded-pill"><?= count($a['items']) ?></span>
+                        </li>
+                    <?php endforeach ?>
+                    
                 </ul>
             </div>
         </div>
@@ -530,7 +527,70 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
-<?php //$this->include('layouts/main/parts/footer') ?>
-<!-- custom --> 
-<script src="<?= base_url("panel/assets/js/index.js") ?>"></script>
+<?php //$this->include('layouts/main/parts/footer') 
+?>
+
+<script>
+    $(document).ready(function() {
+        // chart 2
+
+        var ctx = document.getElementById("chart2").getContext('2d');
+
+        var gradientStroke1 = ctx.createLinearGradient(0, 0, 0, 300);
+        gradientStroke1.addColorStop(0, '#fc4a1a');
+        gradientStroke1.addColorStop(1, '#f7b733');
+
+        var gradientStroke2 = ctx.createLinearGradient(0, 0, 0, 300);
+        gradientStroke2.addColorStop(0, '#4776e6');
+        gradientStroke2.addColorStop(1, '#8e54e9');
+
+
+        var gradientStroke3 = ctx.createLinearGradient(0, 0, 0, 300);
+        gradientStroke3.addColorStop(0, '#ee0979');
+        gradientStroke3.addColorStop(1, '#ff6a00');
+
+        var gradientStroke4 = ctx.createLinearGradient(0, 0, 0, 300);
+        gradientStroke4.addColorStop(0, '#42e695');
+        gradientStroke4.addColorStop(1, '#3bb2b8');
+
+        var myChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: [<?= $dd["chart2"]['js']['labels'] ?>],
+                datasets: [{
+                    backgroundColor: [
+                        gradientStroke1,
+                        gradientStroke2,
+                        gradientStroke3,
+                        gradientStroke4
+                    ],
+                    hoverBackgroundColor: [
+                        gradientStroke1,
+                        gradientStroke2,
+                        gradientStroke3,
+                        gradientStroke4
+                    ],
+                    data: [<?= $dd["chart2"]['js']['data'] ?>],
+                    borderWidth: [1, 1, 1, 1]
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                // cutoutPercentage: 75,
+                legend: {
+                    position: 'bottom',
+                    display: false,
+                    labels: {
+                        boxWidth: 8
+                    }
+                },
+                tooltips: {
+                    displayColors: false,
+                }
+            }
+        });
+    })
+</script>
+<!-- custom -->
+<script src="<?= base_url("panel/assets/js/index.js?" . time()) ?>"></script>
 <?= $this->endSection() ?>
