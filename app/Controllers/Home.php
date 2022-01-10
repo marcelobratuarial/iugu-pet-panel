@@ -5,6 +5,8 @@ use CodeIgniter\API\ResponseTrait;
 use App\Models\PetModel;
 use App\Models\DeletedPlanModel;
 use App\Models\UserModel;
+use CodeIgniter\I18n\Time;
+
 class Home extends BaseController
 {
     use ResponseTrait;
@@ -29,33 +31,33 @@ class Home extends BaseController
 
     public function index()
     {
-        helper('text');
+        helper(['text', 'number']);
 
         $this->pageData["title"] = "Dashboard";
 
-        $args = [];
-        $this->requestURL = $this->baseApi . "invoices?limit=10";
-        $args["m"] = "GET";
-        $args["pl"] = json_encode([
-        ]);
+        // $args = [];
+        // $this->requestURL = $this->baseApi . "invoices?limit=10";
+        // $args["m"] = "GET";
+        // $args["pl"] = json_encode([
+        // ]);
         
-        $r = $this->doRequest($this->requestURL, $args);
-        $faturas = json_decode($r, true);
-        // echo "<pre>";
-        foreach($faturas['items'] as $i => $f) {
-            // print_r($f);
-            foreach($f["variables"] as $v) {
-                if($v["variable"] == "subscription_id") {
-                    unset($f["variables"]);
-                    $faturas['items'][$v["value"]] = $f;
-                    break;
-                }
-            }
-            // $faturas[$f["variables"]];
-            unset($faturas['items'][$i]);
-        }
-        print_r($faturas['items']);
-        exit;
+        // $r = $this->doRequest($this->requestURL, $args);
+        // $faturas = json_decode($r, true);
+        // // echo "<pre>";
+        // foreach($faturas['items'] as $i => $f) {
+        //     // print_r($f);
+        //     foreach($f["variables"] as $v) {
+        //         if($v["variable"] == "subscription_id") {
+        //             unset($f["variables"]);
+        //             $faturas['items'][$v["value"]] = $f;
+        //             break;
+        //         }
+        //     }
+        //     // $faturas[$f["variables"]];
+        //     unset($faturas['items'][$i]);
+        // }
+        // print_r($faturas['items']);
+        // exit;
         // echo base64_encode($this->k);exit;
         $args = [];
         $this->requestURL = $this->baseApi . "plans";
@@ -67,6 +69,37 @@ class Home extends BaseController
         $planos = json_decode($r, true);
         // print_r($planos);exit;
         $this->dashData["total_plans"] = $planos["totalItems"];
+
+
+        //week
+        $paid1Week = date_create("now -1 week");
+        $args = [];
+        $this->requestURL = $this->baseApi . "invoices";
+        $args["m"] = "GET";
+        $args["pl"] = json_encode([
+            'paid_at_from' => $paid1Week->format("Y-m-d"),
+            'status_filter' => "paid"
+        ]);
+        
+        $r = $this->doRequest($this->requestURL, $args);
+        $invoices = json_decode($r, true);
+        
+        $totalWeekCents = 0; 
+        foreach($invoices['items'] as $i=>$in) {
+            unset($invoices["items"][$i]["variables"]);
+            $totalWeekCents += $in["total_cents"];
+        }
+        
+        $decimal = number_format(($totalWeekCents /100), 2, '.', ' ');
+        
+        $real = number_to_currency($decimal, "BRL", null, 2);
+        $pago1Week = [
+            "total" => $real,
+            "start_week" => $paid1Week->format("d/m/Y")
+        ];
+
+        
+        
         
         $planList = [];
         foreach($planos['items'] as $p) {
@@ -80,12 +113,14 @@ class Home extends BaseController
         $this->requestURL = $this->baseApi . "subscriptions";
         $args["m"] = "GET";
         $args["pl"] = json_encode([
+            'status_filter' => 'active'
         ]);
         
         $r = $this->doRequest($this->requestURL, $args);
         $assinaturas = json_decode($r, true);
         // echo "<pre>";
-        print_r($assinaturas);exit;
+        
+        // print_r($assinaturas);exit;
         $this->dashData["total_subs"] = $assinaturas["totalItems"];
 
         $args = [];
@@ -99,29 +134,96 @@ class Home extends BaseController
         $this->dashData["total_customers"] = $customers["totalItems"];
         // echo "<pre>";
         // print_r($customers);exit;
-
+        $assPlan = [];
         foreach($assinaturas["items"] as $ass) {
             unset($ass["features"]);
             unset($ass["logs"]);
             unset($ass["custom_variables"]);
             unset($ass["subitems"]);
+            if(!isset($assPlan[$ass["plan_identifier"]])) {
+                $assPlan[$ass["plan_identifier"]] = [];
+            }
+            // if(!isset($assPlan[$ass["plan_identifier"]][""]))
+            // $assPlan[$ass["plan_identifier"]] = [
+            //     "plan" => $ass["plan_ref"],
+            //     "plan_ref" => $ass["plan_identifier"],
+            //     "price_cents" => $ass["price_cents"]
+            // ];
             $this->dashData["assinaturas"][$ass["plan_identifier"]][] = $ass;
         }
-        
-        $this->dashData["planList"] = $planList;
+        // echo "<pre>";
+        // print_r($this->dashData["assinaturas"]);exit;
 
+        //invoices 3 months
+        // $last3Months = date_create("now -3 weeks");
+        // $args = [];
+        // $this->requestURL = $this->baseApi . "accounts/invoices";
+        // $args["m"] = "GET";
+        // $args["pl"] = json_encode([
+        //     // 'paid_at_from' => $last3Months->format("Y-m-d"),
+        //     'status' => "paid"
+        // ]);
+        
+        // $r = $this->doRequest($this->requestURL, $args);
+        // $allInvoices = json_decode($r, true);
+        // echo "<pre>";
+        // print_r($allInvoices);exit;
+        // $last3MonthsCents = 0;
+        // $byPlans = [];
+        // foreach($allInvoices as $i=>$in) {
+            // echo "<pre>";
+            // print_r($in);
+            // foreach($in["variables"] as $vi => $v) {
+            //     if($v["variable"] == "subscription_id") {
+            //         if(isset($assPlan[$v["value"]]["plan"])) {
+            //             // echo $assPlan[$v["value"]]["plan"] . "<br>";
+            // $byPlans[""];
+            //         }
+                    
+            //         break;
+            //     }
+            // }
+            // unset($allInvoices["items"][$i]["variables"]);
+            // $last3MonthsCents += $in["total_cents"];
+        // }
+        // print_r($)
+        // exit;
+        // $decimal = number_format(($last3MonthsCents /100), 2, '.', ' ');
+        
+        // $real = number_to_currency($decimal, "BRL", null, 2);
+        // $pago1Week = [
+        //     "total" => $real,
+        //     "start_week" => $last3Months->format("d/m/Y")
+        // ];
+
+        $this->dashData["planList"] = $planList;
+        // echo "<pre>";
+        // print_r($this->dashData["assinaturas"]);exit;
         $c2 = [];
         $c2_r = [];
         foreach($this->dashData["assinaturas"] as $identifier => $a) {
             if(isset($this->dashData["planList"][$identifier])) {
                 // print_r($a);
+                if(!isset($c2[$identifier]["total_cents"])) {
+                    $c2[$identifier]["total_cents"] = 0;
+                }
+                
                 $c2[$identifier]["name"] = $this->dashData["planList"][$identifier]["name"];
+                // $c2[$identifier]["total_cents"] =  0; //$this->dashData["planList"][$identifier]["price_cents"];
+                foreach($this->dashData["assinaturas"][$identifier] as $ai) {
+                    $c2[$identifier]["total_cents"] += $ai["price_cents"];
+                }
                 if(!isset($c2[$identifier]["items"])) {
                     $c2[$identifier]["items"] = [];
                 }
+                // echo "<pre>";
                 // print_r($a);
+                // $c2[$identifier]["items"] = $a["price_cents"];
+                $decimal = number_format(($c2[$identifier]["total_cents"] /100), 2, '.', ' ');
+                $real = number_to_currency($decimal, "BRL", null, 2);
+                $c2[$identifier]["total_real"] = $real;
+
                 $c2[$identifier]["items"] = $this->dashData["assinaturas"][$identifier];
-                
                 // $c2[$identifier]['n'] = count($c2[$identifier]["items"]);
                 // array_push
                 if(!isset($c2_r["labels"])) {
@@ -140,9 +242,11 @@ class Home extends BaseController
         }
         $c2_r["labels"] = rtrim($c2_r["labels"], ',');
         $c2_r["data"] = rtrim($c2_r["data"], ',');
+        // echo "<pre>";
         // print_r($c2);exit;
         $this->dashData["chart2"]["js"] = $c2_r;
         $this->dashData["chart2"]["tb"] = $c2;
+        $this->dashData["pago1Week"] = $pago1Week;
         // [
         //     'chart2'=> [
         //         'bsico' => [

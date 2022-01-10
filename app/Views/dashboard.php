@@ -24,9 +24,10 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div>
-                            <p class="mb-0 text-secondary">Total Revenue</p>
-                            <h4 class="my-1 text-danger">$84,245</h4>
-                            <p class="mb-0 font-13">+5.4% from last week</p>
+                            <p class="mb-0 text-secondary">Pagos na última semana</p>
+                            <h4 class="my-1 text-danger"><?= $dd["pago1Week"]["total"] ?></h4>
+                            <!-- <p class="mb-0 font-13">+5.4% from last week</p> -->
+                            <p class="mb-0 font-13"><?= $dd["pago1Week"]["start_week"] ?></p>
                         </div>
                         <div class="widgets-icons-2 rounded-circle bg-gradient-bloody text-white ms-auto"><i class='bx bxs-wallet'></i>
                         </div>
@@ -150,11 +151,28 @@
                 </div>
                 <ul class="list-group list-group-flush">
                     <?php foreach($dd["chart2"]['tb'] as $i => $a) : ?>
-                        <li class="list-group-item d-flex bg-transparent justify-content-between align-items-center"><?= $a['name'] ?> <span class="badge bg-success rounded-pill"><?= count($a['items']) ?></span>
+                        <li class="list-group-item d-flex bg-transparent justify-content-between align-items-center">
+                            <strong><?= $a['name'] ?> (<?= $a['total_real'] ?>)</strong>
+                            <!-- <span> </span> -->
+                            <span class="badge bg-success rounded-pill"><?= count($a['items']) ?></span>
                         </li>
                     <?php endforeach ?>
                     
                 </ul>
+                <!-- <div class="row row-group border-top g-0">
+                    <div class="col">
+                        <div class="p-3 text-center">
+                            <h4 class="mb-0 text-danger">$45,216</h4>
+                            <p class="mb-0">Clothing</p>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="p-3 text-center">
+                            <h4 class="mb-0 text-success">$68,154</h4>
+                            <p class="mb-0">Electronic</p>
+                        </div>
+                    </div>
+                </div> -->
             </div>
         </div>
     </div>
@@ -284,7 +302,7 @@
     </div>
 
 
-    <div class="row">
+    <!-- <div class="row">
         <div class="col-12 col-lg-7 col-xl-8 d-flex">
             <div class="card radius-10 w-100">
                 <div class="card-header bg-transparent">
@@ -411,10 +429,10 @@
             </div>
 
         </div>
-    </div>
+    </div> -->
     <!--end row-->
 
-    <div class="row row-cols-1 row-cols-lg-3">
+    <!-- <div class="row row-cols-1 row-cols-lg-3">
         <div class="col d-flex">
             <div class="card radius-10 w-100">
                 <div class="card-body">
@@ -516,10 +534,9 @@
                         </div>
                     </div>
                 </div>
-                <!--end row-->
             </div>
         </div>
-    </div>
+    </div> -->
     <!--end row-->
 
 </div>
