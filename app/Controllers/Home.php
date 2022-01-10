@@ -301,7 +301,7 @@ class Home extends BaseController
         $percentChange = (1 - $oldFigure / $newFigure) * 100;
 
         $ds = null;
-        $d = round($percentChange, 0);
+        $d = round($percentChange, 3);
         if($d == 0) {
             $ds = "bg-warning";
         } else if($d > 0) {
