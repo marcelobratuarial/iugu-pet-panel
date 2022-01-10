@@ -38,10 +38,11 @@
         <div class="col">
             <div class="card radius-10 border-start border-0 border-3 border-success">
                 <div class="card-body">
-                    <div class="d-flex align-items-center">
+                    <div class="d-flex align-items-center justify-content-between">
                         <div>
                             <p class="mb-0 text-secondary">Esta semana</p>
                             <h4 class="my-1 text-success"><?= $dd["pago1Week"]["total"] ?></h4>
+                            <h5 class="my-1 text-success">+<?=$dd["pago2WeekPercent"] ?></h5>
                             <p class="mb-0 font-13"><?= $dd["pago1Week"]["start_week"] ?></p>
                         </div>
                         <div class="widgets-icons-2 rounded-circle bg-gradient-ohhappiness text-white ms-auto"><i class='bx bxs-bar-chart-alt-2'></i>
