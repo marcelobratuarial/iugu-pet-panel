@@ -94,11 +94,40 @@ class Home extends BaseController
         
         $real = number_to_currency($decimal, "BRL", null, 2);
         $pago1Week = [
+            "total_cents" => $totalWeekCents,
             "total" => $real,
             "start_week" => $paid1Week->format("d/m/Y")
         ];
 
+        // 2 weeks
+        $paid2Week = date_create("now -2 week");
+        $args = [];
+        $this->requestURL = $this->baseApi . "invoices";
+        $args["m"] = "GET";
+        $args["pl"] = json_encode([
+            'paid_at_from' => $paid2Week->format("Y-m-d"),
+            'paid_at_to' => $paid1Week->format("Y-m-d"),
+            'status_filter' => "paid"
+        ]);
         
+        $r = $this->doRequest($this->requestURL, $args);
+        $invoices = json_decode($r, true);
+        
+        $totalWeekCents = 0; 
+        foreach($invoices['items'] as $i=>$in) {
+            unset($invoices["items"][$i]["variables"]);
+            $totalWeekCents += $in["total_cents"];
+        }
+        
+        $decimal = number_format(($totalWeekCents /100), 2, '.', ' ');
+        
+        $real = number_to_currency($decimal, "BRL", null, 2);
+        $pago2Week = [
+            "total_cents" => $totalWeekCents,
+            "total" => $real,
+            "start_week" => $paid2Week->format("d/m/Y"),
+            "end_week" => $paid1Week->format("d/m/Y"),
+        ];
         
         
         $planList = [];
@@ -201,6 +230,7 @@ class Home extends BaseController
         // print_r($this->dashData["assinaturas"]);exit;
         $c2 = [];
         $c2_r = [];
+        $this->dashData["assinaturas_alt"] = [];
         foreach($this->dashData["assinaturas"] as $identifier => $a) {
             if(isset($this->dashData["planList"][$identifier])) {
                 // print_r($a);
@@ -212,6 +242,18 @@ class Home extends BaseController
                 // $c2[$identifier]["total_cents"] =  0; //$this->dashData["planList"][$identifier]["price_cents"];
                 foreach($this->dashData["assinaturas"][$identifier] as $ai) {
                     $c2[$identifier]["total_cents"] += $ai["price_cents"];
+                    $decimal = number_format(($c2[$identifier]["total_cents"] /100), 2, '.', ' ');
+                    $real = number_to_currency($decimal, "BRL", null, 2);
+                    $ai["real"] = $real;
+                    // $date = date_create($assinatura['cycled_at']);
+
+                    $created = date_create($ai['created_at']);
+                    $date = $created->format('d/m/Y') ;
+                    $ai["created_pt"] = $date;
+                    // echo $periodo;
+                    // $assinaturas[$i]['periodo'] = $periodo;
+
+                    $this->dashData["assinaturas_alt"][] = $ai;
                 }
                 if(!isset($c2[$identifier]["items"])) {
                     $c2[$identifier]["items"] = [];
@@ -243,10 +285,28 @@ class Home extends BaseController
         $c2_r["labels"] = rtrim($c2_r["labels"], ',');
         $c2_r["data"] = rtrim($c2_r["data"], ',');
         // echo "<pre>";
-        // print_r($c2);exit;
+        // print_r($this->dashData["assinaturas_alt"]);exit;
+//         $oldFigure = 0;
+// $newFigure = 50;
+
+// $percentChange = (1 - $oldFigure / $newFigure) * 100;
+
+// echo round($percentChange, 0);exit;
         $this->dashData["chart2"]["js"] = $c2_r;
         $this->dashData["chart2"]["tb"] = $c2;
         $this->dashData["pago1Week"] = $pago1Week;
+        $this->dashData["pago2Week"] = $pago2Week;
+        $oldFigure = $pago2Week["total_cents"];
+        $newFigure = $pago1Week["total_cents"];
+
+        $percentChange = (1 - $oldFigure / $newFigure) * 100;
+
+        $this->dashData["pago2WeekPercent"] = round($percentChange, 0)."%";
+        // print_r($pago1Week);
+        // print_r($pago2Week);
+        // exit;
+        
+        // exit;
         // [
         //     'chart2'=> [
         //         'bsico' => [
