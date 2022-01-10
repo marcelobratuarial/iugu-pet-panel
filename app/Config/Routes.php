@@ -33,11 +33,16 @@ $routes->setAutoRoute(false);
 // We get a performance increase by specifying the default
 // route since we don't have to scan directories.
 $routes->post('/logar', 'Logar::signin');
+$routes->get('/sair', 'Logar::logout');
 
 $routes->get('/mailteste', 'Home::mailTeste');
 $routes->get('/', function () {
     return redirect()->to('dashboard'); 
 }); //,['filter' => 'authFilter']);
+$routes->get('/perfil', 'Home::perfil', ['filter' => 'authFilter']);
+$routes->get('/settings', 'Home::settings', ['filter' => 'authFilter']);
+$routes->get('/meus-ganhos', 'Home::meusGanhos', ['filter' => 'authFilter']);
+$routes->get('/meus-ganhos', 'Home::meusGanhos', ['filter' => 'authFilter']);
 $routes->get('/dashboard', 'Home::index', ['filter' => 'authFilter']);
 $routes->get('/planos/edit/(:any)', 'Home::planoEdit/$1', ['filter' => 'authFilter']);
 $routes->get('/planos/add', 'Home::planoCreate/$1', ['filter' => 'authFilter']);

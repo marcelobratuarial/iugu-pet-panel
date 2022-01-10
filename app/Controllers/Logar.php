@@ -8,6 +8,10 @@ use App\Models\UserModel;
 use \Firebase\JWT\JWT;
 use App\Controllers\RegisterController;
 
+use CodeIgniter\Cookie\Cookie;
+use CodeIgniter\Cookie\CookieStore;
+
+
 class Logar extends BaseController
 {
     use ResponseTrait;
@@ -123,7 +127,27 @@ class Logar extends BaseController
 
     public function logout()
     {
-        session()->destroy();
+        // helper("cookie");
+        $session = session();
+        $array_items = ['id', 'email', 'name', 'isSignedIn'];
+        // $session->remove($array_items);
+        $store = new CookieStore([
+            new Cookie('jwtteste')
+        ]);
+        
+        // // adding a new Cookie instance
+        // $new = $store->put(new Cookie('admin_token', 'yes'));
+        
+        // removing a Cookie instance
+        $new = $store->remove('jwtteste');
+        $store->dispatch();
+        // print_r($new); // array of Cookie objects
+        // exit;
+        // set_cookie("jwtteste", "", time() - 3600);
+        // exit;
+        // $session->destroy();
+        // session()->destroy();
+
         return redirect()->to('/');
     }
 }

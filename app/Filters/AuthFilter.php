@@ -28,11 +28,55 @@ class AuthFilter implements FilterInterface
     public function before(RequestInterface $request, $arguments = null)
     {
         helper('cookie');
-        // var_dump(get_cookie("jwtteste"));
+        // var_dump(get_cookie("jwtteste"));exit;
+        
+        $session = session();
+        $hasSession = $session->get();
         $token = get_cookie("jwtteste");
+        
+
+
+        if($session->get('isSignedIn') && !empty($token)) {
+            $key = getenv('JWT_SECRET');
+
+            try {
+                $decoded = JWT::decode($token, $key, array("HS256"));
+                // print_r($decoded);exit;
+            } catch (Exception $ex) {
+                $response = service('response');
+                if($request->isAJAX()) {
+                    return $response->setJSON([
+                        "error" => true,
+                        'message' => "unauthorized",
+                        'data' => $ex
+                    ]);
+                } else {
+                    
+                    return redirect()->to('auth'); 
+                }
+                // print_r($ex);exit;
+                // $response = service('response');
+                // return redirect()->to('minha-conta/login'); 
+                
+                // $response->setBody('Access denied3');
+                // $response->setStatusCode(401);
+                // return $response;
+            }
+        } else {
+            if($request->isAJAX()) {
+                $response = service('response');
+                return $response->setJSON([
+                    "error" => true,
+                    'message' => "unauthorized"
+                ]);
+            } else {
+                $response = service('response');
+                return redirect()->to('auth'); 
+            }
+        }
         // echo $token;exit;
         
-        $key = getenv('JWT_SECRET');
+        
         /* DEFAULT 
         $header = $request->getHeader("Authorization");
         $token = null;
@@ -45,49 +89,9 @@ class AuthFilter implements FilterInterface
         } */
         // var_dump($request->isAJAX());exit;
         // check if token is null or empty
-        if(is_null($token) || empty($token)) {
-            // echo "ee";exit;
-            if($request->isAJAX()) {
-                $response = service('response');
-                return $response->setJSON([
-                    "error" => true,
-                    'message' => "unauthorized"
-                ]);
-            } else {
-                $response = service('response');
-                return redirect()->to('auth'); 
-            }
-            
-            // $response->setBody('Access denied2');
-            // $response->setStatusCode(401);
-            // return $response;
-        } else {
-            // echo "go on";exit;
-        }
+        
         // print_r($key);exit;
-        try {
-            $decoded = JWT::decode($token, $key, array("HS256"));
-            // print_r($decoded);exit;
-        } catch (Exception $ex) {
-            $response = service('response');
-            if($request->isAJAX()) {
-                return $response->setJSON([
-                    "error" => true,
-                    'message' => "unauthorized",
-                    'data' => $ex
-                ]);
-            } else {
-                
-                return redirect()->to('auth'); 
-            }
-            // print_r($ex);exit;
-            // $response = service('response');
-            // return redirect()->to('minha-conta/login'); 
-            
-            // $response->setBody('Access denied3');
-            // $response->setStatusCode(401);
-            // return $response;
-        }
+        
     }
 
     /**
