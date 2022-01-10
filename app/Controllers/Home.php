@@ -89,7 +89,6 @@ class Home extends BaseController
             unset($invoices["items"][$i]["variables"]);
             $totalWeekCents += $in["total_cents"];
         }
-        
         $decimal = number_format(($totalWeekCents /100), 2, '.', ' ');
         
         $real = number_to_currency($decimal, "BRL", null, 2);
@@ -301,7 +300,17 @@ class Home extends BaseController
 
         $percentChange = (1 - $oldFigure / $newFigure) * 100;
 
-        $this->dashData["pago2WeekPercent"] = round($percentChange, 0)."%";
+        $ds = null;
+        $d = round($percentChange, 0);
+        if($d == 0) {
+            $ds = "bg-warning";
+        } else if($d > 0) {
+            $ds = "bg-success";
+        } else {
+            $ds = "bg-danger";
+        }
+        $this->dashData["pago2WeekPercent"] = ($d > 0) ? '+'.$d. "%" : $d . "%";
+        $this->dashData["pago2WeekPercentDs"] = $ds;
         // print_r($pago1Week);
         // print_r($pago2Week);
         // exit;
