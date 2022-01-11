@@ -286,12 +286,12 @@ class Home extends BaseController
         $c2_r["data"] = rtrim($c2_r["data"], ',');
         // echo "<pre>";
         // print_r($this->dashData["assinaturas_alt"]);exit;
-//         $oldFigure = 0;
-// $newFigure = 50;
+        //         $oldFigure = 0;
+        // $newFigure = 50;
 
-// $percentChange = (1 - $oldFigure / $newFigure) * 100;
+        // $percentChange = (1 - $oldFigure / $newFigure) * 100;
 
-// echo round($percentChange, 0);exit;
+        // echo round($percentChange, 0);exit;
         $args = [];
         $this->requestURL = $this->baseApi . "accounts/invoices";
         $args["m"] = "GET";
@@ -882,14 +882,27 @@ class Home extends BaseController
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }
         
-        foreach($assinaturas['items'] as $a) {
-            if($a["id"] == $id) {
-                
-                $assinatura["plan_ref"] = $a['plan_ref'];
+        foreach($assinaturas['items'] as $as) {
+            if($as["id"] == $id) {
+                // print_r($as);
+                if(!empty($as['plan_identifier'])) {
+
+                    $args = [];
+                    $this->requestURL = $a->baseApi . "plans/identifier/".$as['plan_identifier'];
+                    $args["m"] = "GET";
+                    $args["pl"] = json_encode([
+                        'identifier' => $as['plan_identifier']
+                    ]);
+                    $p = json_decode($a->doRequest($this->requestURL, $args),true);
+                    if(!isset($p["errors"])) {
+                        $assinatura["plan_id"] = $p['id'];
+                    } 
+                }
+                $assinatura["plan_ref"] = $as['plan_ref'];
                 break;
             }
         };
-        // print_r($assinatura);
+        // print_r($assinatura);exit;
         // exit;
         // $args = [];
         // $this->requestURL = $a->baseApi . "plans/identifier/".$assinatura["plan_identifier"];

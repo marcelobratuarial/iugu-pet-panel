@@ -15,17 +15,17 @@
         </ol>
       </nav>
     </div>
-    <div class="ms-auto">
+    <!-- <div class="ms-auto">
       <div class="btn-group">
         <button type="button" class="btn btn-primary split-bg-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown"><i class="bx bx-menu"></i> <span class="visually-hidden">Toggle Dropdown</span>
         </button>
         <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-end"> <a class="reembolsar-fatura-btn dropdown-item" href="javascript:;"><i class="bx bx-money"></i> <span>Reembolsar</span></a>
-          <!-- <a class="dropdown-item" href="javascript:;">Another action</a>
+          <a class="dropdown-item" href="javascript:;">Another action</a>
           <a class="dropdown-item" href="javascript:;">Something else here</a>
-          <div class="dropdown-divider"></div> <a class="dropdown-item" href="javascript:;">Separated link</a> -->
+          <div class="dropdown-divider"></div> <a class="dropdown-item" href="javascript:;">Separated link</a>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
   <!--end breadcrumb-->
   <?php //print_r($assinatura);exit;
@@ -40,7 +40,7 @@
               <h4><?= $customer["name"] ?></h4>
               <p class="text-secondary mb-1"><?= $customer["email"] ?></p>
               <!-- <p class="text-muted font-size-sm">Bay Area, San Francisco, CA</p> -->
-              <button class="btn btn-outline-primary">Ver detalhes</button>
+              <!-- <button class="btn btn-outline-primary">Ver detalhes</button> -->
             </div>
           </div>
           <hr class="my-4" />

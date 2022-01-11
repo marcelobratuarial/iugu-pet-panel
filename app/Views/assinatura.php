@@ -41,7 +41,7 @@
               <h4><?= $assinatura["customer_name"] ?></h4>
               <p class="text-secondary mb-1"><?= $assinatura["customer_email"] ?></p>
               <!-- <p class="text-muted font-size-sm">Bay Area, San Francisco, CA</p> -->
-              <button class="btn btn-outline-primary">Ver detalhes</button>
+              <a href="<?= base_url("clientes/details/".$assinatura['customer_id']) ?>" class="btn btn-outline-primary">Ver detalhes</a>
             </div>
           </div>
           <hr class="my-4" />
@@ -100,11 +100,13 @@
                 <!-- <div class="d-grid"> <a href="#" class="btn btn-success my-2 radius-30">ASSINAR</a>
                                       </div> -->
               </div>
+              <?php if(isset($assinatura["plan_id"])) : ?>
               <div class="card-footer">
-                <a href="" class="btn btn-info my-2 radius-30">Editar <i
+                <a href="<?= base_url("planos/edit/".$assinatura["plan_id"]) ?>" class="btn btn-info my-2 radius-30">Editar <i
                     class='bx bx-edit-alt me-2 font-18'></i></a>
                 
               </div>
+              <?php endif ?>
             </div>
           </div>
         </div>
