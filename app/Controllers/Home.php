@@ -169,8 +169,9 @@ class Home extends BaseController
             unset($ass["custom_variables"]);
             unset($ass["subitems"]);
             if(!isset($assPlan[$ass["plan_identifier"]])) {
-                $assPlan[$ass["plan_identifier"]] = [];
+                $assPlan[$ass["id"]] = [];
             }
+            $assPlan[$ass["id"]][] = $ass;
             // if(!isset($assPlan[$ass["plan_identifier"]][""]))
             // $assPlan[$ass["plan_identifier"]] = [
             //     "plan" => $ass["plan_ref"],
@@ -291,6 +292,168 @@ class Home extends BaseController
 // $percentChange = (1 - $oldFigure / $newFigure) * 100;
 
 // echo round($percentChange, 0);exit;
+        $args = [];
+        $this->requestURL = $this->baseApi . "accounts/invoices";
+        $args["m"] = "GET";
+        $args["pl"] = json_encode([
+            // 'paid_at_from' => $last3Months->format("Y-m-d"),
+            'status' => "paid"
+        ]);
+        
+        $r = $this->doRequest($this->requestURL, $args);
+        $allInvoices = json_decode($r, true);
+        
+        $plansByMonth = [];
+        
+        // echo "<pre>";
+        // print_r($assPlan);exit;
+        foreach($allInvoices as $i) {
+            $month = date_create($i["paid_at"])->format("m");
+            $year = date_create($i["paid_at"])->format("Y");
+
+            $sid = $i["subscription_id"];
+            $subs = isset($assPlan[$sid]) ? $assPlan[$sid][0] : null;
+            if(!isset($plansByMonth[$month])) {
+                $plansByMonth[$month] = [];
+            }
+            if(!isset($plansByMonth[$month][$year])) {
+                $plansByMonth[$month][$year] = [];
+            }
+            
+            if($subs) {
+                // print_r($subs);
+
+                // var_dump($plansByMonth[$month][$assPlan[$i["subscription_id"]]]);
+                if(!isset($plansByMonth[$month][$year][$subs["plan_identifier"]])) {
+                    $plansByMonth[$month][$year][$subs["plan_identifier"]] = [
+                        "Month" => $month,
+                        "Year" => $year,
+                        "Label" => $subs["plan_ref"],
+                        "Items" => [],
+                        "TotalItems" => 0
+                    ];
+                }
+                $plansByMonth[$month][$year][$subs["plan_identifier"]]["Items"][] = $i;
+                $plansByMonth[$month][$year][$subs["plan_identifier"]]["TotalItems"] = 
+                    count($plansByMonth[$month][$year][$subs["plan_identifier"]]["Items"]);
+            } else {
+                if(!isset($plansByMonth[$month][$year]['deleted'])) {
+                    $plansByMonth[$month][$year]['deleted'] = [
+                        "Month" => $month,
+                        "Year" => $year,
+                        "Label" => "Desconhecido",
+                        "Items" => [],
+                        "TotalItems" => 0
+                    ];
+                }
+                $i["assinatura"] = "Removida";
+                $i["plan_ref"] = "Desconhecido";
+                $plansByMonth[$month][$year]['deleted']["Items"][] = $i;
+                $plansByMonth[$month][$year]['deleted']["TotalItems"] = 
+                    count($plansByMonth[$month][$year]['deleted']["Items"]);
+            }
+
+            // print_r($assPlan[$i["id"]]);
+            // print_r($this->dashData["planList"][]);
+        }
+        // echo "<pre>";
+        $mList = [
+            "01" => "Jan",
+            "02" => "Fev",
+            "03" => "Mar",
+            "04" => "Abr",
+            "05" => "Mai",
+            "06" => "Jun",
+            "07" => "Jul",
+            "08" => "Ago",
+            "09" => "Set",
+            "10" => "Out",
+            "11" => "Nov",
+            "12" => "Dez"
+        ];
+        $chart_1_months = "";
+        $chart_data = [];
+        foreach($plansByMonth as $m => $year) {
+            $m = (integer) $m;
+            
+            if($m < 10) {
+                $m = (string) "0".$m;
+            }
+            // print_r(key($year));
+            $chart_1_months .= '"'.$mList[$m] . '/'.key($year).'", ';
+            // echo "<hr>";
+            foreach($year as $y => $plan) {
+                // print_r($y);
+                // echo "<hr>";
+                foreach($plan as $p => $a) {
+                    if(!isset($chart_data[$mList[$m]])) {
+                        $chart_data[$mList[$m]] = [];
+                        // $chart_data[$mList[$m]][$p] = [
+                        //     "P" => $a["Label"],
+                        //     "T" => 0
+                        // ];
+                    }
+                    $chart_data[$mList[$m]][$p] = [
+                        "Plano" => $a["Label"],
+                        "Total" => $a["TotalItems"]
+                    ];
+                 }
+                // echo "<hr>";
+            }
+        }
+        $planListCopy = $planList;
+        $planListCopy["deleted"] = [
+            "name" => "Desconhecido"
+        ];
+        $pl = array_keys($planListCopy);
+        // print_r($chart_data);exit;
+        $chart_data2 = [];
+        foreach($pl as $pi) {
+            // print_r($pi);
+            foreach($chart_data as $e => $t) {
+                // print_r($e);
+            
+                if(!isset($chart_data[$e][$pi])) {
+                    $chart_data[$e][$pi] = [
+                        "Plano" => isset($planListCopy[$pi]["name"]) ? $planListCopy[$pi]["name"] : "Unknown",
+                        "Total" => "0"
+                    ];
+                }  
+                
+                if(!isset($chart_data2)) {
+                    $chart_data2 = [];
+                } 
+
+                if(!isset($chart_data2[$pi])) {
+                    $chart_data2[$pi] = [
+                        "P" => isset($planListCopy[$pi]["name"]) ? $planListCopy[$pi]["name"] : "Unknown",
+                        "T" => ""
+                    ];
+                } 
+                $chart_data2[$pi]["T"] .= $chart_data[$e][$pi]["Total"] . ", ";
+                // var_dump($chart_data[$e][$pi]);
+                // $chart_data2[$e][$pi]["T"] .= isset($chart_data[$e][$pi]["T"]) ? $chart_data[$e][$pi]["T"] : 0;
+            }
+            $chart_data2[$pi]["T"] = rtrim($chart_data2[$pi]["T"],", ");
+            // if(!isset($chart_data[$e][key($t)])) {
+            //     echo "tem<br>";
+            // }
+            // print_r($e);
+            // print_r($t);
+            // print_r($chart_data);
+            
+        }
+        $chart_1_months = rtrim($chart_1_months, ", ");
+        // print_r($chart_data);
+        // print_r($chart_data);
+        // exit;
+
+
+
+        $this->dashData["chart_1_months"] = $chart_1_months;
+        $this->dashData["chart_1_data"] = $chart_data2;
+        $this->dashData["chart_1_data_plans"] = count($chart_data2);
+
         $this->dashData["chart2"]["js"] = $c2_r;
         $this->dashData["chart2"]["tb"] = $c2;
         $this->dashData["pago1Week"] = $pago1Week;
