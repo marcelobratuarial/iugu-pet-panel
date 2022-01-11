@@ -727,7 +727,49 @@ class Home extends BaseController
         // print_r(json_decode($r, true));exit;
         return view('plans', ["plans" => $planos, "user" => $user, "pd" => $this->pageData]);
     }
-
+    public function perfil()
+    {
+        helper(['text',"number"]);
+        $this->pageData["title"] = "Perfil";
+        
+        
+        // print_r($planos);exit;
+        session();
+        // echo "<pre>";
+        // print_r($_SESSION['email']);exit;
+        if(isset($_SESSION['email'])) {
+            // echo "<pre>";
+            // print_r($_SESSION);
+            // echo "</pre>";
+            /* $args["m"] = "GET";
+            $this->requestURL = $this->baseApi . "customers";
+            $args["pl"] = json_encode([
+                "query" => $_SESSION['email'],
+                "limit" => 1
+            ]);
+            $user = $this->doRequest($this->requestURL, $args);
+            // echo gettype(json_decode($user, true));exit;
+            $u = json_decode($user, true);
+            unset($user);
+            $user = [];
+            if($u["totalItems"] > 0) {
+                $user = $u['items'][0];
+                $user["m"] = ellipsize($user["email"], 18);
+            } */
+            $UsersModel = new UserModel();
+        
+            $email = $_SESSION['email'];
+            
+            
+            $user = $UsersModel->where('email', $email)->first();
+            $user["m"] = ellipsize($user["email"], 18);
+        } else {
+            $user = [];
+        }
+        // print_r($planos);exit;
+        // print_r(json_decode($r, true));exit;
+        return view('perfil', ["user" => $user, "pd" => $this->pageData]);
+    }
     public function assinaturas()
     {
         helper(['text',"number"]);
