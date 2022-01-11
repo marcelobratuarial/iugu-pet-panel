@@ -41,7 +41,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" checked>
+                                            <input class="form-check-input" name="keep" value="1" type="checkbox" id="flexSwitchCheckChecked" checked>
                                             <label class="form-check-label" for="flexSwitchCheckChecked">Manter logado</label>
                                         </div>
                                     </div>

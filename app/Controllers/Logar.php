@@ -29,8 +29,12 @@ class Logar extends BaseController
         $model = new UserModel();
         
         $email = $this->request->getVar('email');
+        $keep = $this->request->getVar('keep');
         $password = $this->request->getVar('password');
-        
+        $customExpire = 24 * 3600;
+        if(!is_null($keep)) {
+            $customExpire = time()+40000;
+        }
         $data = $model->where('email', $email)->first();
         
         if($data){
@@ -49,14 +53,14 @@ class Logar extends BaseController
                 $session->set($ses_data);
                 $key = getenv('JWT_SECRET');
                 $iat = time(); // current timestamp value
-                $exp = $iat + 3600;
+                $exp = $iat * 3600;
         
                 $payload = array(
                     "iss" => "Issuer of the JWT",
                     "aud" => "Audience that the JWT",
                     "sub" => "Subject of the JWT",
                     "iat" => $iat, //Time the JWT issued at
-                    "exp" => $exp, // Expiration time of token
+                    "exp" => $customExpire, // Expiration time of token
                     "email" => $data['email'],
                 );
                 
@@ -70,7 +74,7 @@ class Logar extends BaseController
                 set_cookie([
                     'name' => 'jwtteste',
                     'value' => $token,
-                    'expire' => 3600*24,
+                    'expire' => $customExpire,
                     'httponly' => true
                 ]);
                 for($i = 1; $i < 100; $i++) {
@@ -81,7 +85,7 @@ class Logar extends BaseController
                         set_cookie([
                             'name' => 'jwtteste',
                             'value' => $token,
-                            'expire' => 3600*24,
+                            'expire' => $customExpire,
                             'httponly' => true
                         ]);
                     } else {
