@@ -82,7 +82,7 @@
             <div>
               <h6 class="mb-0">Resumo</h6>
             </div>
-            <div class="dropdown ms-auto">
+            <!-- <div class="dropdown ms-auto">
               <a class="dropdown-toggle dropdown-toggle-nocaret" href="#" data-bs-toggle="dropdown"><i
                   class='bx bx-dots-horizontal-rounded font-22 text-option'></i>
               </a>
@@ -97,7 +97,7 @@
                 <li><a class="dropdown-item" href="javascript:;">Something else here</a>
                 </li>
               </ul>
-            </div>
+            </div> -->
           </div>
           <!-- <div class="d-flex align-items-center ms-auto font-13 gap-2 my-3">
             <span class="border px-1 rounded cursor-pointer"><i class="bx bxs-circle me-1"
@@ -141,7 +141,7 @@
             <div>
               <h6 class="mb-0">Planos</h6>
             </div>
-            <div class="dropdown ms-auto">
+            <!-- <div class="dropdown ms-auto">
               <a class="dropdown-toggle dropdown-toggle-nocaret" href="#" data-bs-toggle="dropdown"><i
                   class='bx bx-dots-horizontal-rounded font-22 text-option'></i>
               </a>
@@ -156,7 +156,7 @@
                 <li><a class="dropdown-item" href="javascript:;">Something else here</a>
                 </li>
               </ul>
-            </div>
+            </div> -->
           </div>
           <div class="chart-container-2 mt-4">
             <canvas id="chart2"></canvas>
@@ -197,7 +197,7 @@
         <div>
           <h6 class="mb-0">Assinaturas recentes</h6>
         </div>
-        <div class="dropdown ms-auto">
+        <!-- <div class="dropdown ms-auto">
           <a class="dropdown-toggle dropdown-toggle-nocaret" href="#" data-bs-toggle="dropdown"><i
               class='bx bx-dots-horizontal-rounded font-22 text-option'></i>
           </a>
@@ -212,7 +212,7 @@
             <li><a class="dropdown-item" href="javascript:;">Something else here</a>
             </li>
           </ul>
-        </div>
+        </div> -->
       </div>
       <div class="table-responsive">
         <table class="table align-middle mb-0">
